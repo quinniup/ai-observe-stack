@@ -300,7 +300,9 @@ helm install ai-observe-stack ai-observe-stack/ai-observe-stack \
 特点：
 - 每个节点部署一个日志采集 Collector，采集 `/var/log/containers/*.log`
 - 只读挂载 `/var/log/containers` 和 `/var/log/pods`
-- 启用 `file_storage` 持久化采集 offset，避免 Collector 重启后重复采集
+- 按 `poll_interval` 轮询容器日志文件，通过 `fingerprint_size` 识别文件身份
+- 启用 `file_storage` 持久化采集 offset，避免 Collector 重启后从文件开头重复采集
+- 启用 `retry_on_failure`，下游 Gateway 短暂不可用时暂停并重试
 - 日志通过 OTLP 转发到现有 OTel Gateway，再统一写入 Doris
 - 业务 Pod 不需要 sidecar，适合上千 Pod 规模
 
@@ -353,6 +355,8 @@ grafana:
 推荐方案：
 - 优先让应用日志输出到 stdout/stderr，由 Kubernetes/container runtime 管理容器日志文件
 - 使用 `logCollector.enabled=true` 的 DaemonSet 采集 `/var/log/containers/*.log`
+- 保持默认 include 范围，不扫描压缩归档或任意宿主机目录，减少轮转归档文件被重复读取的机会
+- 通过 `poll_interval` 轮询文件、`fingerprint_size` 识别文件、`file_storage` 保存 offset
 - Collector 只负责采集，不作为主要磁盘清理组件
 - 如果必须采集业务文件日志，应用侧必须配置按大小/时间轮转、保留天数和总大小上限
 - Collector 挂载宿主机日志目录时应保持只读，offset 状态单独写入 `logCollector.storage.path`

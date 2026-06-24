@@ -300,7 +300,9 @@ helm install ai-observe-stack ai-observe-stack/ai-observe-stack \
 Features:
 - Deploys one log collector per node and tails `/var/log/containers/*.log`
 - Mounts `/var/log/containers` and `/var/log/pods` as read-only host paths
-- Enables `file_storage` to persist file offsets and avoid duplicate collection after collector restarts
+- Polls container log files with `poll_interval` and identifies file identity with `fingerprint_size`
+- Enables `file_storage` to persist file offsets and avoid rereading files from the beginning after collector restarts
+- Enables `retry_on_failure` so the receiver pauses and retries during short downstream Gateway failures
 - Forwards logs to the existing OTel Gateway through OTLP before Doris ingestion
 - Does not require workload sidecars, making it suitable for clusters with thousands of pods
 
@@ -355,6 +357,8 @@ Do not mount every workload's file-log directory onto the node without rotation 
 Recommended approach:
 - Prefer stdout/stderr application logs managed by Kubernetes/container runtime
 - Use the `logCollector.enabled=true` DaemonSet to tail `/var/log/containers/*.log`
+- Keep the default include scope so compressed archives and arbitrary node directories are not scanned and reread after rotation
+- Use `poll_interval` for filesystem polling, `fingerprint_size` for file identity, and `file_storage` for offset persistence
 - Treat Collector as the ingestion component, not the primary disk cleanup mechanism
 - For mandatory workload file logs, configure application-side rotation by size/time, retention days, and total size cap
 - Keep host log mounts read-only and write only offset state under `logCollector.storage.path`

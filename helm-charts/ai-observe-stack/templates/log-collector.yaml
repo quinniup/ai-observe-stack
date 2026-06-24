@@ -25,11 +25,22 @@ data:
 {{ toYaml . | nindent 10 }}
         {{ end }}
         start_at: {{ .Values.logCollector.filelog.startAt }}
+        poll_interval: {{ .Values.logCollector.filelog.pollInterval }}
+        fingerprint_size: {{ .Values.logCollector.filelog.fingerprintSize }}
+        max_log_size: {{ .Values.logCollector.filelog.maxLogSize }}
+        max_concurrent_files: {{ .Values.logCollector.filelog.maxConcurrentFiles }}
         include_file_path: true
         include_file_name: true
+        include_file_path_resolved: {{ .Values.logCollector.filelog.includeFilePathResolved }}
+        include_file_name_resolved: {{ .Values.logCollector.filelog.includeFileNameResolved }}
         {{ if .Values.logCollector.storage.enabled }}
         storage: file_storage
         {{ end }}
+        retry_on_failure:
+          enabled: {{ .Values.logCollector.filelog.retryOnFailure.enabled }}
+          initial_interval: {{ .Values.logCollector.filelog.retryOnFailure.initialInterval }}
+          max_interval: {{ .Values.logCollector.filelog.retryOnFailure.maxInterval }}
+          max_elapsed_time: {{ .Values.logCollector.filelog.retryOnFailure.maxElapsedTime }}
         operators:
           - type: container
 
