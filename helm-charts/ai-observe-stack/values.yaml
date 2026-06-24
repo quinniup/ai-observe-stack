@@ -199,6 +199,48 @@ otel:
         env: kubernetes
 
 # =============================================================================
+# Node Log Collector Configuration
+# =============================================================================
+logCollector:
+  # Optional DaemonSet for Kubernetes/ACK container stdout/stderr log collection.
+  # The main OTel Collector above remains the gateway; this collector tails node
+  # container logs and forwards them to the gateway through OTLP.
+  enabled: false
+  mode: containerStdout
+
+  image:
+    repository: otel/opentelemetry-collector-contrib
+    tag: "0.144.0"
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  hostPaths:
+    containers: /var/log/containers
+    pods: /var/log/pods
+
+  storage:
+    enabled: true
+    path: /var/lib/otelcol/file_storage
+
+  filelog:
+    include:
+      - /var/log/containers/*.log
+    exclude: []
+    startAt: end
+
+  export:
+    otlp:
+      # Defaults to the in-chart OTel Gateway service when empty.
+      endpoint: ""
+
+# =============================================================================
 # Grafana Configuration
 # =============================================================================
 grafana:

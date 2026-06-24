@@ -171,6 +171,8 @@ helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-st
 | `doris.internal.cluster.be.replicas` | BE 副本数 | `1` |
 | `otel.enabled` | 启用 OpenTelemetry Collector | `true` |
 | `otel.replicas` | OTel Collector 副本数 | `2` |
+| `logCollector.enabled` | 启用节点级日志采集 DaemonSet | `false` |
+| `logCollector.mode` | 日志采集模式，目前支持 `containerStdout` | `containerStdout` |
 | `grafana.enabled` | 启用 Grafana | `true` |
 | `grafana.adminPassword` | Grafana 管理员密码 | `admin` |
 | `dorisPlugin.enabled` | 启用 Doris App 插件 | `true` |
@@ -285,6 +287,23 @@ helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-st
 - 启用 Debug Exporter
 - 最小资源请求
 
+### ACK / Kubernetes 节点日志采集
+
+ACK 或标准 Kubernetes 生产环境建议使用节点级 DaemonSet 采集容器标准输出，而不是为每个业务 Pod 注入 sidecar：
+
+```bash
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack \
+  -n ai-observe-stack \
+  -f values-ack.yaml
+```
+
+特点：
+- 每个节点部署一个日志采集 Collector，采集 `/var/log/containers/*.log`
+- 只读挂载 `/var/log/containers` 和 `/var/log/pods`
+- 启用 `file_storage` 持久化采集 offset，避免 Collector 重启后重复采集
+- 日志通过 OTLP 转发到现有 OTel Gateway，再统一写入 Doris
+- 业务 Pod 不需要 sidecar，适合上千 Pod 规模
+
 ### 生产环境
 
 高可用配置：
@@ -326,6 +345,17 @@ grafana:
       cpu: "1"
       memory: "1Gi"
 ```
+
+### 日志采集与宿主机磁盘风险
+
+生产环境不建议把所有业务容器的文件日志目录无约束挂载到宿主机，再由 Collector 扫宿主机目录采集。该方式如果缺少日志轮转和保留上限，可能打满节点磁盘并影响同节点其他 Pod。
+
+推荐方案：
+- 优先让应用日志输出到 stdout/stderr，由 Kubernetes/container runtime 管理容器日志文件
+- 使用 `logCollector.enabled=true` 的 DaemonSet 采集 `/var/log/containers/*.log`
+- Collector 只负责采集，不作为主要磁盘清理组件
+- 如果必须采集业务文件日志，应用侧必须配置按大小/时间轮转、保留天数和总大小上限
+- Collector 挂载宿主机日志目录时应保持只读，offset 状态单独写入 `logCollector.storage.path`
 
 ### Ingress 配置
 
@@ -519,4 +549,3 @@ kubectl get doriscluster -n ai-observe-stack
 | `ai-observe-stack-doris-fe-service` | 9030 | Doris MySQL 协议 |
 | `ai-observe-stack-doris-fe-service` | 8030 | Doris FE HTTP (Stream Load) |
 | `ai-observe-stack-doris-be-service` | 8040 | Doris BE HTTP |
-

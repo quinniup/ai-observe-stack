@@ -1,6 +1,6 @@
 # OpenClaw Log Collector Configuration
 #
-# This collector runs as a sidecar to collect OpenClaw's JSONL/text log files
+# This local collector collects OpenClaw's JSONL/text log files
 # via the filelog receiver and forwards them to the ai-observe-stack OTel Gateway.
 #
 # The community otel-observability plugin does not support Log OTLP export,

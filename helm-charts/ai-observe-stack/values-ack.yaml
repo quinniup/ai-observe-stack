@@ -1,0 +1,27 @@
+# =============================================================================
+# AIObserve Stack - Alibaba Cloud ACK Recommended Values
+# =============================================================================
+# Enables node-level container stdout/stderr log collection through a DaemonSet.
+# The main OTel Collector StatefulSet remains the central gateway and Doris writer.
+
+logCollector:
+  enabled: true
+  mode: containerStdout
+
+  hostPaths:
+    containers: /var/log/containers
+    pods: /var/log/pods
+
+  storage:
+    enabled: true
+    path: /var/lib/otelcol/file_storage
+
+  filelog:
+    include:
+      - /var/log/containers/*.log
+    exclude: []
+    startAt: end
+
+  export:
+    otlp:
+      endpoint: ""
