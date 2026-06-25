@@ -108,6 +108,21 @@ spec:
       annotations:
         checksum/config: {{ toYaml .Values.logCollector | sha256sum }}
     spec:
+      {{- if and .Values.logCollector.storage.enabled .Values.logCollector.storage.chown.enabled }}
+      initContainers:
+        - name: prepare-file-storage
+          image: "{{ .Values.logCollector.storage.chown.image.repository }}:{{ .Values.logCollector.storage.chown.image.tag }}"
+          imagePullPolicy: {{ .Values.logCollector.storage.chown.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - mkdir -p /storage && chown -R {{ .Values.logCollector.storage.chown.owner }} /storage
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: file-storage
+              mountPath: /storage
+      {{- end }}
       containers:
         - name: log-collector
           image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
@@ -143,6 +158,11 @@ spec:
             - name: varlog-pods
               mountPath: {{ .Values.logCollector.hostPaths.pods }}
               readOnly: true
+            {{- if .Values.logCollector.hostPaths.dockerContainers }}
+            - name: docker-containers
+              mountPath: {{ .Values.logCollector.hostPaths.dockerContainers }}
+              readOnly: true
+            {{- end }}
             {{- if .Values.logCollector.storage.enabled }}
             - name: file-storage
               mountPath: {{ .Values.logCollector.storage.path }}
@@ -159,6 +179,12 @@ spec:
           hostPath:
             path: {{ .Values.logCollector.hostPaths.pods }}
             type: Directory
+        {{- if .Values.logCollector.hostPaths.dockerContainers }}
+        - name: docker-containers
+          hostPath:
+            path: {{ .Values.logCollector.hostPaths.dockerContainers }}
+            type: Directory
+        {{- end }}
         {{- if .Values.logCollector.storage.enabled }}
         - name: file-storage
           hostPath:

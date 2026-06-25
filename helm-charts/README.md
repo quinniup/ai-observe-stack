@@ -173,6 +173,9 @@ helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-st
 | `otel.replicas` | Number of OTel Collector replicas | `2` |
 | `logCollector.enabled` | Enable the node-level log collector DaemonSet | `false` |
 | `logCollector.mode` | Log collection mode, currently supports `containerStdout` | `containerStdout` |
+| `logCollector.hostPaths.dockerContainers` | Optional Docker runtime log directory mount for symlink targets | `""` |
+| `logCollector.storage.path` | Writable offset persistence directory for the node log collector | `/var/lib/otelcol/file_storage` |
+| `logCollector.storage.chown.enabled` | Enable initContainer ownership fix for the offset hostPath | `true` |
 | `grafana.enabled` | Enable Grafana | `true` |
 | `grafana.adminPassword` | Grafana admin password | `admin` |
 | `dorisPlugin.enabled` | Enable Doris App Plugin | `true` |
@@ -298,13 +301,24 @@ helm install ai-observe-stack ai-observe-stack/ai-observe-stack \
 ```
 
 Features:
-- Deploys one log collector per node and tails `/var/log/containers/*.log`
+- Deploys one log collector per node and tails `/var/log/pods/*/*/*.log`
 - Mounts `/var/log/containers` and `/var/log/pods` as read-only host paths
 - Polls container log files with `poll_interval` and identifies file identity with `fingerprint_size`
 - Enables `file_storage` to persist file offsets and avoid rereading files from the beginning after collector restarts
 - Enables `retry_on_failure` so the receiver pauses and retries during short downstream Gateway failures
 - Forwards logs to the existing OTel Gateway through OTLP before Doris ingestion
 - Does not require workload sidecars, making it suitable for clusters with thousands of pods
+
+For Docker runtime clusters such as OrbStack, `/var/log/pods/*/*/*.log` may point to `/var/lib/docker/containers/*/*-json.log`. In that case, add a read-only runtime mount and keep metadata parsing on the original Kubernetes path:
+
+```yaml
+logCollector:
+  hostPaths:
+    dockerContainers: /var/lib/docker/containers
+  filelog:
+    includeFilePathResolved: false
+    includeFileNameResolved: false
+```
 
 ### Production
 
@@ -356,7 +370,7 @@ Do not mount every workload's file-log directory onto the node without rotation 
 
 Recommended approach:
 - Prefer stdout/stderr application logs managed by Kubernetes/container runtime
-- Use the `logCollector.enabled=true` DaemonSet to tail `/var/log/containers/*.log`
+- Use the `logCollector.enabled=true` DaemonSet to tail `/var/log/pods/*/*/*.log`
 - Keep the default include scope so compressed archives and arbitrary node directories are not scanned and reread after rotation
 - Use `poll_interval` for filesystem polling, `fingerprint_size` for file identity, and `file_storage` for offset persistence
 - Treat Collector as the ingestion component, not the primary disk cleanup mechanism

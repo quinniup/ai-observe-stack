@@ -2,7 +2,7 @@ apiVersion: v2
 name: ai-observe-stack
 description: AIObserve Stack - A complete observability stack using Apache Doris as the storage backend for traces, metrics, and logs, with OpenTelemetry and Grafana.
 type: application
-version: 0.1.2
+version: 0.1.3
 appVersion: "0.1.0"
 
 keywords:

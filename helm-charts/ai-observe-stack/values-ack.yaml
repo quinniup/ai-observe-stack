@@ -11,14 +11,22 @@ logCollector:
   hostPaths:
     containers: /var/log/containers
     pods: /var/log/pods
+    dockerContainers: ""
 
   storage:
     enabled: true
     path: /var/lib/otelcol/file_storage
+    chown:
+      enabled: true
+      owner: "10001:10001"
+      image:
+        repository: busybox
+        tag: "1.36"
+        pullPolicy: IfNotPresent
 
   filelog:
     include:
-      - /var/log/containers/*.log
+      - /var/log/pods/*/*/*.log
     exclude: []
     startAt: end
     pollInterval: 1s

@@ -142,7 +142,7 @@ docker run -d \
 
 > **注意：** 容器加入了 `docker_aiobs-net` 网络，以便通过 `otel-collector:4317` 访问 OTel Gateway。
 
-> **生产建议：** 在 ACK/Kubernetes 中，优先使用 Helm 的 `values-ack.yaml` 启用 DaemonSet 节点级采集，采集容器 stdout/stderr 对应的 `/var/log/containers/*.log`。不建议为大量业务 Pod 注入 sidecar，也不建议无约束地把业务文件日志目录挂到宿主机。若必须采集业务文件日志，应用侧需要配置按大小/时间轮转、保留天数和总大小上限，Collector 只负责采集，不作为磁盘清理组件。
+> **生产建议：** 在 ACK/Kubernetes 中，优先使用 Helm 的 `values-ack.yaml` 启用 DaemonSet 节点级采集，采集容器 stdout/stderr 对应的 `/var/log/pods/*/*/*.log`。不建议为大量业务 Pod 注入 sidecar，也不建议无约束地把业务文件日志目录挂到宿主机。若必须采集业务文件日志，应用侧需要配置按大小/时间轮转、保留天数和总大小上限，Collector 只负责采集，不作为磁盘清理组件。
 
 验证 Log Collector 是否运行正常：
 

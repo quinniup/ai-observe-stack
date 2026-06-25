@@ -173,6 +173,9 @@ helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-st
 | `otel.replicas` | OTel Collector 副本数 | `2` |
 | `logCollector.enabled` | 启用节点级日志采集 DaemonSet | `false` |
 | `logCollector.mode` | 日志采集模式，目前支持 `containerStdout` | `containerStdout` |
+| `logCollector.hostPaths.dockerContainers` | Docker runtime 场景下可选挂载的日志 symlink 目标目录 | `""` |
+| `logCollector.storage.path` | 节点日志采集器 offset 持久化写入目录 | `/var/lib/otelcol/file_storage` |
+| `logCollector.storage.chown.enabled` | 启用 initContainer 修正 offset hostPath 目录权限 | `true` |
 | `grafana.enabled` | 启用 Grafana | `true` |
 | `grafana.adminPassword` | Grafana 管理员密码 | `admin` |
 | `dorisPlugin.enabled` | 启用 Doris App 插件 | `true` |
@@ -298,13 +301,24 @@ helm install ai-observe-stack ai-observe-stack/ai-observe-stack \
 ```
 
 特点：
-- 每个节点部署一个日志采集 Collector，采集 `/var/log/containers/*.log`
+- 每个节点部署一个日志采集 Collector，采集 `/var/log/pods/*/*/*.log`
 - 只读挂载 `/var/log/containers` 和 `/var/log/pods`
 - 按 `poll_interval` 轮询容器日志文件，通过 `fingerprint_size` 识别文件身份
 - 启用 `file_storage` 持久化采集 offset，避免 Collector 重启后从文件开头重复采集
 - 启用 `retry_on_failure`，下游 Gateway 短暂不可用时暂停并重试
 - 日志通过 OTLP 转发到现有 OTel Gateway，再统一写入 Doris
 - 业务 Pod 不需要 sidecar，适合上千 Pod 规模
+
+对于 OrbStack 这类 Docker runtime 集群，`/var/log/pods/*/*/*.log` 可能会继续指向 `/var/lib/docker/containers/*/*-json.log`。这种情况下需要额外挂载 Docker runtime 日志目录，并让元数据解析使用原始 Kubernetes 路径：
+
+```yaml
+logCollector:
+  hostPaths:
+    dockerContainers: /var/lib/docker/containers
+  filelog:
+    includeFilePathResolved: false
+    includeFileNameResolved: false
+```
 
 ### 生产环境
 
@@ -354,7 +368,7 @@ grafana:
 
 推荐方案：
 - 优先让应用日志输出到 stdout/stderr，由 Kubernetes/container runtime 管理容器日志文件
-- 使用 `logCollector.enabled=true` 的 DaemonSet 采集 `/var/log/containers/*.log`
+- 使用 `logCollector.enabled=true` 的 DaemonSet 采集 `/var/log/pods/*/*/*.log`
 - 保持默认 include 范围，不扫描压缩归档或任意宿主机目录，减少轮转归档文件被重复读取的机会
 - 通过 `poll_interval` 轮询文件、`fingerprint_size` 识别文件、`file_storage` 保存 offset
 - Collector 只负责采集，不作为主要磁盘清理组件

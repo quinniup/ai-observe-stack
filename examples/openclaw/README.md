@@ -142,7 +142,7 @@ docker run -d \
 
 > **Note:** The container joins `docker_aiobs-net` so it can reach the OTel Gateway at `otel-collector:4317`.
 
-> **Production guidance:** In ACK/Kubernetes, prefer enabling the Helm `values-ack.yaml` DaemonSet to collect container stdout/stderr logs from `/var/log/containers/*.log`. Avoid injecting a sidecar into every workload pod at large scale, and avoid mounting unbounded workload file-log directories onto the node. If workload file logs must be collected, configure application-side rotation by size/time, retention days, and total size cap. Collector should ingest logs, not be the primary disk cleanup mechanism.
+> **Production guidance:** In ACK/Kubernetes, prefer enabling the Helm `values-ack.yaml` DaemonSet to collect container stdout/stderr logs from `/var/log/pods/*/*/*.log`. Avoid injecting a sidecar into every workload pod at large scale, and avoid mounting unbounded workload file-log directories onto the node. If workload file logs must be collected, configure application-side rotation by size/time, retention days, and total size cap. Collector should ingest logs, not be the primary disk cleanup mechanism.
 
 Verify the log collector is running:
 
