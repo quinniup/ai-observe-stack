@@ -199,6 +199,69 @@ otel:
         env: kubernetes
 
 # =============================================================================
+# Node Log Collector Configuration
+# =============================================================================
+logCollector:
+  # Optional DaemonSet for Kubernetes/ACK container stdout/stderr log collection.
+  # The main OTel Collector above remains the gateway; this collector tails node
+  # container logs and forwards them to the gateway through OTLP.
+  enabled: false
+  mode: containerStdout
+
+  image:
+    repository: otel/opentelemetry-collector-contrib
+    tag: "0.144.0"
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  hostPaths:
+    containers: /var/log/containers
+    pods: /var/log/pods
+    # Optional for Docker runtime clusters where /var/log/pods/*.log points to
+    # /var/lib/docker/containers/*/*-json.log.
+    dockerContainers: ""
+
+  storage:
+    enabled: true
+    path: /var/lib/otelcol/file_storage
+    chown:
+      enabled: true
+      owner: "10001:10001"
+      image:
+        repository: busybox
+        tag: "1.36"
+        pullPolicy: IfNotPresent
+
+  filelog:
+    include:
+      - /var/log/pods/*/*/*.log
+    exclude: []
+    startAt: end
+    pollInterval: 1s
+    fingerprintSize: 1kb
+    maxLogSize: 1MiB
+    maxConcurrentFiles: 1024
+    includeFilePathResolved: true
+    includeFileNameResolved: true
+    retryOnFailure:
+      enabled: true
+      initialInterval: 1s
+      maxInterval: 30s
+      maxElapsedTime: 0
+
+  export:
+    otlp:
+      # Defaults to the in-chart OTel Gateway service when empty.
+      endpoint: ""
+
+# =============================================================================
 # Grafana Configuration
 # =============================================================================
 grafana:
@@ -237,6 +300,7 @@ grafana:
 # =============================================================================
 dorisPlugin:
   enabled: true
+  pluginId: doris-app
   # Plugin + Dashboards image (build from images/doris-plugin/)
   image:
     repository: velodb/doris-app-plugin

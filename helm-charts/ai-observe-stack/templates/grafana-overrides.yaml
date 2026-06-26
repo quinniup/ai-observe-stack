@@ -112,7 +112,7 @@ spec:
             {{- if .Values.dorisPlugin.enabled }}
             # Allow loading unsigned doris-app plugin
             - name: GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS
-              value: "velodb-doris-app"
+              value: {{ .Values.dorisPlugin.pluginId | quote }}
             {{- end }}
             # Enable feature toggles for tracing
             - name: GF_FEATURE_TOGGLES_ENABLE
@@ -144,6 +144,11 @@ spec:
             - name: dashboard-providers
               mountPath: /etc/grafana/provisioning/dashboards
               readOnly: true
+            {{- if .Values.dorisPlugin.enabled }}
+            - name: plugins
+              mountPath: /etc/grafana/provisioning/plugins
+              readOnly: true
+            {{- end }}
       volumes:
         - name: storage
           {{- if .Values.grafana.persistence.enabled }}
@@ -158,6 +163,11 @@ spec:
         - name: dashboard-providers
           configMap:
             name: {{ include "aiobs.grafana.fullname" . }}-dashboard-providers
+        {{- if .Values.dorisPlugin.enabled }}
+        - name: plugins
+          configMap:
+            name: {{ include "aiobs.grafana.fullname" . }}-plugins
+        {{- end }}
 
 ---
 # Grafana Service

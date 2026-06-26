@@ -182,6 +182,13 @@ OTel Collector full name
 {{- end }}
 
 {{/*
+Node log collector full name
+*/}}
+{{- define "aiobs.logCollector.fullname" -}}
+{{ include "aiobs.fullname" . }}-log-collector
+{{- end }}
+
+{{/*
 Grafana full name
 */}}
 {{- define "aiobs.grafana.fullname" -}}
