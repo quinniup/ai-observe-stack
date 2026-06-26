@@ -300,6 +300,7 @@ grafana:
 # =============================================================================
 dorisPlugin:
   enabled: true
+  pluginId: doris-app
   # Plugin + Dashboards image (build from images/doris-plugin/)
   image:
     repository: velodb/doris-app-plugin

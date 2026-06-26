@@ -61,4 +61,25 @@ data:
         allowUiUpdates: true
         options:
           path: /var/lib/grafana/dashboards/aiobs
+{{- if .Values.dorisPlugin.enabled }}
+
+---
+# Plugin Apps ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aiobs.grafana.fullname" . }}-plugins
+  labels:
+    {{- include "aiobs.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+data:
+  plugins.yaml: |
+    # Grafana Plugin App Provisioning
+    apiVersion: 1
+
+    apps:
+      - type: {{ .Values.dorisPlugin.pluginId | quote }}
+        org_id: 1
+        disabled: false
+{{- end }}
 {{- end }}
