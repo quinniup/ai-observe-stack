@@ -6,9 +6,9 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   DEFAULT_LOGS_CONFIG: () => (/* reexport safe */ _types_plugin_settings__WEBPACK_IMPORTED_MODULE_10__.T),
+/* harmony export */   DEFAULT_LOGS_CONFIG: () => (/* reexport safe */ _types_plugin_settings__WEBPACK_IMPORTED_MODULE_10__.TO),
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
-/* harmony export */   mergeLogsConfig: () => (/* reexport safe */ _types_plugin_settings__WEBPACK_IMPORTED_MODULE_10__.o)
+/* harmony export */   mergeLogsConfig: () => (/* reexport safe */ _types_plugin_settings__WEBPACK_IMPORTED_MODULE_10__.oW)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5959);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -28,6 +28,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _store_discover__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(6247);
 /* harmony import */ var _types_plugin_settings__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(325);
 /* harmony import */ var _utils_errors__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(9071);
+/* harmony import */ var _services_grafana_permissions__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(7116);
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -122,7 +123,10 @@ function _object_spread_props(target, source) {
 
 
 
+
 const AppConfig = ({ plugin })=>{
+    var _ref;
+    var _currentLogsConfig_applicationAttributeKey;
     const s = (0,_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.useStyles2)(getStyles);
     const { enabled, pinned, jsonData, secureJsonFields } = plugin.meta;
     const [state, setState] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
@@ -130,10 +134,13 @@ const AppConfig = ({ plugin })=>{
         apiKey: '',
         isApiKeySet: Boolean(secureJsonFields === null || secureJsonFields === void 0 ? void 0 : secureJsonFields.apiKey)
     });
-    const logsConfig = (0,_types_plugin_settings__WEBPACK_IMPORTED_MODULE_10__/* .mergeLogsConfig */ .o)(jsonData === null || jsonData === void 0 ? void 0 : jsonData.logsConfig);
+    const logsConfig = (0,_types_plugin_settings__WEBPACK_IMPORTED_MODULE_10__/* .mergeLogsConfig */ .oW)(jsonData === null || jsonData === void 0 ? void 0 : jsonData.logsConfig);
     const [currentLogsConfig, setCurrentLogsConfig] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(logsConfig);
+    const [teamDatasourcePermissions, setTeamDatasourcePermissions] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)((_ref = jsonData === null || jsonData === void 0 ? void 0 : jsonData.teamDatasourcePermissions) !== null && _ref !== void 0 ? _ref : []);
+    const [teams, setTeams] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
     const [databases, setDatabases] = (0,jotai__WEBPACK_IMPORTED_MODULE_6__/* .useAtom */ .fp)(_store_discover__WEBPACK_IMPORTED_MODULE_9__/* .settingDatabasesAtom */ .AW);
     const [tables, setTables] = (0,jotai__WEBPACK_IMPORTED_MODULE_6__/* .useAtom */ .fp)(_store_discover__WEBPACK_IMPORTED_MODULE_9__/* .settingTablesAtom */ .L);
+    const applicationAttributeKey = ((_currentLogsConfig_applicationAttributeKey = currentLogsConfig.applicationAttributeKey) === null || _currentLogsConfig_applicationAttributeKey === void 0 ? void 0 : _currentLogsConfig_applicationAttributeKey.trim()) || '';
     const isSubmitDisabled = Boolean(!state.apiUrl || !state.isApiKeySet && !state.apiKey);
     const resolveDatasource = react__WEBPACK_IMPORTED_MODULE_0___default().useCallback((ds)=>{
         if (!ds) {
@@ -143,6 +150,47 @@ const AppConfig = ({ plugin })=>{
             return (0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_4__.getDataSourceSrv)().getList().find((item)=>item.uid === ds || item.name === ds);
         }
         return ds;
+    }, []);
+    const datasourceOptions = react__WEBPACK_IMPORTED_MODULE_0___default().useMemo(()=>{
+        try {
+            return (0,_services_grafana_permissions__WEBPACK_IMPORTED_MODULE_12__/* .getMysqlDatasources */ .tH)((0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_4__.getDataSourceSrv)().getList()).map((ds)=>({
+                    label: ds.name,
+                    value: ds.uid
+                }));
+        } catch (unused) {
+            return [];
+        }
+    }, []);
+    const teamOptions = react__WEBPACK_IMPORTED_MODULE_0___default().useMemo(()=>{
+        return teams.map((team)=>({
+                label: team.name,
+                value: team.id
+            }));
+    }, [
+        teams
+    ]);
+    const updatePermission = react__WEBPACK_IMPORTED_MODULE_0___default().useCallback((index, patch)=>{
+        setTeamDatasourcePermissions((current)=>current.map((permission, permissionIndex)=>permissionIndex === index ? _object_spread({}, permission, patch) : permission));
+    }, []);
+    const addPermission = react__WEBPACK_IMPORTED_MODULE_0___default().useCallback(()=>{
+        const firstTeam = teams.find((team)=>!teamDatasourcePermissions.some((permission)=>permission.teamId === team.id));
+        setTeamDatasourcePermissions((current)=>{
+            var _ref, _ref1;
+            return [
+                ...current,
+                {
+                    teamId: (_ref = firstTeam === null || firstTeam === void 0 ? void 0 : firstTeam.id) !== null && _ref !== void 0 ? _ref : 0,
+                    teamName: (_ref1 = firstTeam === null || firstTeam === void 0 ? void 0 : firstTeam.name) !== null && _ref1 !== void 0 ? _ref1 : '',
+                    datasourceUids: []
+                }
+            ];
+        });
+    }, [
+        teamDatasourcePermissions,
+        teams
+    ]);
+    const removePermission = react__WEBPACK_IMPORTED_MODULE_0___default().useCallback((index)=>{
+        setTeamDatasourcePermissions((current)=>current.filter((_, permissionIndex)=>permissionIndex !== index));
     }, []);
     const fetchDatabases = react__WEBPACK_IMPORTED_MODULE_0___default().useCallback((ds)=>{
         const datasourceRef = resolveDatasource(ds);
@@ -232,12 +280,18 @@ const AppConfig = ({ plugin })=>{
         });
     };
     const submitLogConfig = ()=>{
+        if (!applicationAttributeKey) {
+            return;
+        }
         updatePluginAndReload(plugin.meta.id, {
             enabled,
             pinned,
             jsonData: _object_spread_props(_object_spread({}, jsonData), {
                 apiUrl: state.apiUrl,
-                logsConfig: _object_spread({}, currentLogsConfig)
+                logsConfig: _object_spread_props(_object_spread({}, currentLogsConfig), {
+                    applicationAttributeKey
+                }),
+                teamDatasourcePermissions: teamDatasourcePermissions.filter((permission)=>permission.teamId > 0)
             }),
             // This cannot be queried later by the frontend.
             // We don't want to override it in case it was set previously and left untouched now.
@@ -246,6 +300,12 @@ const AppConfig = ({ plugin })=>{
             }
         });
     };
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(()=>{
+        void (0,_services_grafana_permissions__WEBPACK_IMPORTED_MODULE_12__/* .fetchTeams */ .jS)().then(setTeams).catch((err)=>(0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_4__.logError)((0,_utils_errors__WEBPACK_IMPORTED_MODULE_11__/* .toError */ .i)(err), {
+                source: 'AppConfig',
+                action: 'fetchTeams'
+            }));
+    }, []);
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(()=>{
         const datasourceRef = resolveDatasource(currentLogsConfig.datasource);
         if (datasourceRef && datasourceRef !== currentLogsConfig.datasource) {
@@ -365,11 +425,69 @@ const AppConfig = ({ plugin })=>{
                 targetTraceTable: selectedTable.value
             }));
         }
-    })), /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    })), /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.Field, {
+        label: "Application resource attribute key",
+        description: "Resource attribute used by the Discover Application filter, for example app or k8s.pod.label.app.",
+        invalid: !applicationAttributeKey,
+        error: !applicationAttributeKey ? 'Application resource attribute key is required' : undefined
+    }, /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.Input, {
+        width: 60,
+        "data-testid": _testIds__WEBPACK_IMPORTED_MODULE_8__/* .testIds */ .b.appConfig.applicationAttributeKey,
+        value: currentLogsConfig.applicationAttributeKey || '',
+        placeholder: "app",
+        onChange: (event)=>{
+            setCurrentLogsConfig(_object_spread_props(_object_spread({}, currentLogsConfig), {
+                applicationAttributeKey: event.target.value
+            }));
+        }
+    })), /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.Field, {
+        label: "Team Datasource Permissions",
+        description: "Users with no teams can view all MySQL datasources. Users in teams can only view datasources configured here."
+    }, /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, teamDatasourcePermissions.map((permission, index)=>{
+        const selectedDatasourceOptions = datasourceOptions.filter((option)=>{
+            var _option_value;
+            return permission.datasourceUids.includes((_option_value = option.value) !== null && _option_value !== void 0 ? _option_value : '');
+        });
+        return /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+            className: s.permissionRow,
+            key: `${permission.teamId}-${index}`
+        }, /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.Select, {
+            width: 30,
+            options: teamOptions,
+            value: permission.teamId || undefined,
+            placeholder: "Choose team",
+            onChange: (selectedTeam)=>{
+                var _selectedTeam_value, _selectedTeam_label;
+                updatePermission(index, {
+                    teamId: (_selectedTeam_value = selectedTeam.value) !== null && _selectedTeam_value !== void 0 ? _selectedTeam_value : 0,
+                    teamName: (_selectedTeam_label = selectedTeam.label) !== null && _selectedTeam_label !== void 0 ? _selectedTeam_label : ''
+                });
+            }
+        }), /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.MultiSelect, {
+            width: 45,
+            options: datasourceOptions,
+            value: selectedDatasourceOptions,
+            placeholder: "Choose datasources",
+            onChange: (selectedDatasources)=>{
+                updatePermission(index, {
+                    datasourceUids: selectedDatasources.map((datasource)=>datasource.value).filter((uid)=>Boolean(uid))
+                });
+            }
+        }), /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.Button, {
+            type: "button",
+            variant: "destructive",
+            onClick: ()=>removePermission(index)
+        }, "Remove"));
+    }), /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.Button, {
+        type: "button",
+        variant: "secondary",
+        onClick: addPermission
+    }, "Add team permission"))), /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
         className: s.marginTop
     }, /*#__PURE__*/ react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_grafana_ui__WEBPACK_IMPORTED_MODULE_5__.Button, {
-        type: "submit"
-    }, "Save Logs settings")))));
+        type: "submit",
+        disabled: !applicationAttributeKey
+    }, "Save plugin settings")))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AppConfig);
 const getStyles = (theme)=>({
@@ -378,6 +496,12 @@ const getStyles = (theme)=>({
   `,
         marginTop: (0,_emotion_css__WEBPACK_IMPORTED_MODULE_2__.css)`
     margin-top: ${theme.spacing(3)};
+  `,
+        permissionRow: (0,_emotion_css__WEBPACK_IMPORTED_MODULE_2__.css)`
+    display: flex;
+    gap: ${theme.spacing(1)};
+    margin-bottom: ${theme.spacing(1)};
+    align-items: flex-start;
   `
     });
 const updatePluginAndReload = (pluginId, data)=>_async_to_generator(function*() {
@@ -415,6 +539,7 @@ const testIds = {
     appConfig: {
         apiKey: 'data-testid ac-api-key',
         apiUrl: 'data-testid ac-api-url',
+        applicationAttributeKey: 'data-testid application-attribute-key',
         submit: 'data-testid ac-submit-form'
     },
     pageOne: {
@@ -446,22 +571,22 @@ __webpack_require__.d(__webpack_exports__, {
   aR: () => (/* binding */ DEFAULT_SERVICE),
   fU: () => (/* binding */ FORMAT_DATE),
   Bg: () => (/* binding */ IntervalEnum),
+  Gy: () => (/* binding */ PLUGIN_BASE_URL),
   bw: () => (/* binding */ ROUTES),
   Vy: () => (/* binding */ getAutoInterval),
   VA: () => (/* binding */ translationDateIntervalType)
 });
 
-// UNUSED EXPORTS: AUTO_INTERVALS, CAN_SEARCH_FIELD_TYPE, ENABLE_SEARCH_FIELD_TYPE, PLUGIN_BASE_URL
+// UNUSED EXPORTS: AUTO_INTERVALS, CAN_SEARCH_FIELD_TYPE, ENABLE_SEARCH_FIELD_TYPE
 
 ;// ./plugin.json
-const plugin_namespaceObject = {};
+const plugin_namespaceObject = /*#__PURE__*/JSON.parse('{"id":"velodb-doris-app"}');
 // EXTERNAL MODULE: ../node_modules/lodash-es/groupBy.js + 4 modules
 var groupBy = __webpack_require__(35);
 ;// ./constants.ts
-/* unused harmony import specifier */ var pluginJson;
 
 
-const PLUGIN_BASE_URL = (/* unused pure expression or super */ null && (`/a/${pluginJson.id}`));
+const PLUGIN_BASE_URL = `/a/${plugin_namespaceObject.id}`;
 var ROUTES = /*#__PURE__*/ function(ROUTES) {
     ROUTES["One"] = "one";
     ROUTES["Discover"] = "discover";
@@ -709,4 +834,4 @@ function translationDateIntervalType(type) {
 /***/ }
 
 }]);
-//# sourceMappingURL=170.js.map?_cache=0af4d6d7753bcb84128f
+//# sourceMappingURL=170.js.map?_cache=397122ac605dfada73ed

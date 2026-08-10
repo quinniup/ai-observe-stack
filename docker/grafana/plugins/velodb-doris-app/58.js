@@ -1,5 +1,5 @@
 "use strict";
-(self["webpackChunkvelodb_doris_app"] = self["webpackChunkvelodb_doris_app"] || []).push([[285],{
+(self["webpackChunkvelodb_doris_app"] = self["webpackChunkvelodb_doris_app"] || []).push([[58],{
 
 /***/ 5611
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
@@ -11,6 +11,7 @@ const testIds = {
     appConfig: {
         apiKey: 'data-testid ac-api-key',
         apiUrl: 'data-testid ac-api-url',
+        applicationAttributeKey: 'data-testid application-attribute-key',
         submit: 'data-testid ac-submit-form'
     },
     pageOne: {
@@ -32,7 +33,7 @@ const testIds = {
 
 /***/ },
 
-/***/ 9285
+/***/ 5058
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 // ESM COMPAT FLAG
@@ -400,6 +401,7 @@ function FilterContent({ onHide, dataFilterValue }) {
         const newItem = {
             id,
             fieldName: field.value,
+            variantKey: field.value === (dataFilterValue === null || dataFilterValue === void 0 ? void 0 : dataFilterValue.fieldName) ? dataFilterValue === null || dataFilterValue === void 0 ? void 0 : dataFilterValue.variantKey : undefined,
             operator: opValue,
             // Only persist label when showLabel is true. Otherwise ensure it's empty.
             label: showLabel ? label : '',
@@ -862,13 +864,13 @@ var get = __webpack_require__(7230);
 
 
 
+function normalizeTopDataValue(value) {
+    return (0,utils_data/* formatFieldDisplayValue */.xW)(value, 'compact');
+}
 function countValueDistribution(jsonArray, key) {
     const valueCountMap = new Map();
     jsonArray.forEach((obj)=>{
-        let value = (0,get/* default */.A)(obj, key);
-        if (value === undefined) {
-            value = '';
-        }
+        const value = normalizeTopDataValue((0,get/* default */.A)(obj, key));
         valueCountMap.set(value, (valueCountMap.get(value) || 0) + 1);
     });
     const result = {};
@@ -879,12 +881,10 @@ function countValueDistribution(jsonArray, key) {
     return result;
 }
 function TopData({ field }) {
-    var _field_Type;
     const topData = (0,react/* useAtomValue */.md)(discover/* topDataAtom */.l_);
     const tableTotalCount = (0,react/* useAtomValue */.md)(discover/* tableTotalCountAtom */.HC);
     const [dataFilter, setDataFilter] = (0,react/* useAtom */.fp)(discover/* dataFilterAtom */.EA);
-    const canDisplayTopData = (field === null || field === void 0 ? void 0 : (_field_Type = field.Type) === null || _field_Type === void 0 ? void 0 : _field_Type.toUpperCase()) !== 'VARIANT';
-    const res = Object.entries(countValueDistribution(topData, field.Field)).sort((a, b)=>b[1].count - a[1].count);
+    const res = Object.entries(countValueDistribution(topData, field.Field)).sort((a, b)=>b[1] - a[1]);
     return /*#__PURE__*/ external_react_default().createElement("div", {
         className: (0,css_.css)`
                 max-height: 400px;
@@ -908,46 +908,46 @@ function TopData({ field }) {
                     `
     }, "TOP5"), /*#__PURE__*/ external_react_default().createElement("small", {
         className: "text-n2"
-    }, tableTotalCount >= 500 ? 500 : tableTotalCount, " Items")), canDisplayTopData ? /*#__PURE__*/ external_react_default().createElement("div", {
+    }, tableTotalCount >= 500 ? 500 : tableTotalCount, " Items")), /*#__PURE__*/ external_react_default().createElement("div", {
         className: "mt-3 space-y-3 text-n5"
     }, res.map(([value, count], index)=>index < 5 && /*#__PURE__*/ external_react_default().createElement("div", {
             key: index,
             className: "flex items-center justify-between"
         }, /*#__PURE__*/ external_react_default().createElement("div", {
             className: (0,css_.css)`
-                                            overflow: hidden;
-                                            text-overflow: ellipsis;
-                                            white-space: nowrap;
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                    `
+        }, /*#__PURE__*/ external_react_default().createElement("div", {
+            className: (0,css_.css)`
+                                            display: flex;
+                                            align-items: center;
+                                            width: 180px;
+                                            justify-content: space-between;
                                         `
         }, /*#__PURE__*/ external_react_default().createElement("div", {
             className: (0,css_.css)`
-                                                display: flex;
-                                                align-items: center;
-                                                width: 180px;
-                                                justify-content: space-between;
+                                                flex: 1 1 0%;
+                                                overflow: hidden;
+                                                text-overflow: ellipsis;
+                                                white-space: nowrap;
                                             `
-        }, /*#__PURE__*/ external_react_default().createElement("div", {
-            className: (0,css_.css)`
-                                                    flex: 1 1 0%;
-                                                    overflow: hidden;
-                                                    text-overflow: ellipsis;
-                                                    white-space: nowrap;
-                                                `
         }, value), /*#__PURE__*/ external_react_default().createElement("div", {
             className: (0,css_.css)`
-                                                    margin-left: 20px;
-                                                    flex-shrink: 0;
-                                                `
+                                                margin-left: 20px;
+                                                flex-shrink: 0;
+                                            `
         }, +(count * 100 / topData.length).toFixed(1), "%")), /*#__PURE__*/ external_react_default().createElement(progress/* default */.A, {
             size: 4,
             className: (0,css_.css)`
-                                                .ant-progress-outer {
-                                                    .ant-progress-inner {
-                                                        position: absolute;
-                                                        top: 0px;
-                                                    }
+                                            .ant-progress-outer {
+                                                .ant-progress-inner {
+                                                    position: absolute;
+                                                    top: 0px;
                                                 }
-                                            `,
+                                            }
+                                        `,
             style: {
                 width: '100%',
                 height: '0px'
@@ -957,8 +957,8 @@ function TopData({ field }) {
             showInfo: false
         })), !(0,utils_data/* isComplexType */.tF)(field.Type) && /*#__PURE__*/ external_react_default().createElement("div", {
             className: (0,css_.css)`
-                                                margin-left: 30px;
-                                            `
+                                            margin-left: 30px;
+                                        `
         }, /*#__PURE__*/ external_react_default().createElement(ui_.IconButton, {
             name: "plus-circle",
             onClick: (e)=>{
@@ -996,9 +996,7 @@ function TopData({ field }) {
                 ]);
                 e.stopPropagation();
             }
-        }))))) : /*#__PURE__*/ external_react_default().createElement("div", {
-        className: "mt-2 text-xs text-n5"
-    }, "Does not supported"));
+        }))))));
 }
 
 ;// ./components/discover-sidebar/field-item/field-item.tsx
@@ -1174,6 +1172,10 @@ function filter_content_FilterContent() {
             {
                 value: 'DATE',
                 label: 'Date'
+            },
+            {
+                value: 'VARIANT',
+                label: 'Variant'
             }
         ]
     }))));
@@ -1676,11 +1678,23 @@ var build_lib = __webpack_require__(6666);
 
 
 function SDCollapsibleTable(props) {
-    const { data, columns, renderSubComponent, getRowCanExpand, className } = props;
+    const { data, columns, renderSubComponent, getRowCanExpand, className, showExpandAllToggle, allRowsExpanded, onAllRowsExpandedChange } = props;
     const theme = (0,ui_.useTheme2)();
+    const [expanded, setExpanded] = (0,external_react_.useState)(allRowsExpanded ? true : {});
+    (0,external_react_.useEffect)(()=>{
+        if (typeof allRowsExpanded === 'boolean') {
+            setExpanded(allRowsExpanded ? true : {});
+        }
+    }, [
+        allRowsExpanded
+    ]);
     const table = (0,lib/* useReactTable */.N4)({
         data,
         columns,
+        state: {
+            expanded
+        },
+        onExpandedChange: setExpanded,
         getRowCanExpand,
         getCoreRowModel: (0,build_lib/* getCoreRowModel */.HT)(),
         getExpandedRowModel: (0,build_lib/* getExpandedRowModel */.D0)()
@@ -1690,7 +1704,9 @@ function SDCollapsibleTable(props) {
     }, /*#__PURE__*/ external_react_default().createElement("thead", null, table.getHeaderGroups().map((headerGroup)=>/*#__PURE__*/ external_react_default().createElement("tr", {
             key: headerGroup.id,
             className: (0,css_.css)`${theme.isDark ? 'border-bottom: 1px solid hsl(var(--border-dark));' : 'border-bottom: 1px solid hsl(var(--border));'} `
-        }, headerGroup.headers.map((header)=>{
+        }, headerGroup.headers.map((header, index)=>{
+            const renderExpandAllToggle = showExpandAllToggle && index === 0;
+            const isAllRowsExpanded = typeof allRowsExpanded === 'boolean' ? allRowsExpanded : table.getIsAllRowsExpanded();
             return /*#__PURE__*/ external_react_default().createElement("th", {
                 key: header.id,
                 colSpan: header.colSpan,
@@ -1713,7 +1729,15 @@ function SDCollapsibleTable(props) {
                                                 padding-right: 0;
                                             }
                                         `
-            }, header.isPlaceholder ? null : (0,lib/* flexRender */.Kv)(header.column.columnDef.header, header.getContext()));
+            }, renderExpandAllToggle && /*#__PURE__*/ external_react_default().createElement(ui_.IconButton, {
+                name: isAllRowsExpanded ? 'arrow-down' : 'arrow-right',
+                tooltip: isAllRowsExpanded ? 'Collapse all' : 'Expand all',
+                onClick: ()=>{
+                    const nextExpanded = !isAllRowsExpanded;
+                    table.toggleAllRowsExpanded(nextExpanded);
+                    onAllRowsExpandedChange === null || onAllRowsExpandedChange === void 0 ? void 0 : onAllRowsExpandedChange(nextExpanded);
+                }
+            }), header.isPlaceholder ? null : (0,lib/* flexRender */.Kv)(header.column.columnDef.header, header.getContext()));
         })))), /*#__PURE__*/ external_react_default().createElement("tbody", {
         className: (0,css_.css)`
                     #selected {
@@ -2668,122 +2692,8 @@ function SurroundingDiscoverFilter(props) {
 
 // EXTERNAL MODULE: ../node_modules/lodash-es/sortBy.js + 7 modules
 var sortBy = __webpack_require__(5092);
-;// ./services/sql.ts
-function getQueryTableResultSQL(params) {
-    const indexesStatement = params.indexes_statement;
-    let statement = `SELECT * FROM \`${params.database}\`.\`${params.table}\` WHERE`;
-    if (indexesStatement && params.search_type === 'Search') {
-        statement += ` (${indexesStatement}) AND`;
-    }
-    // timeField 加上反引号
-    statement += ` (\`${params.timeField}\` BETWEEN '${params.startDate}' AND '${params.endDate}') `;
-    statement = params.data_filters.reduce((prev, curr)=>{
-        return addSqlFilter(prev, curr);
-    }, statement);
-    if (params.search_type === 'SQL' && params.search_value) {
-        statement = statement + ` AND ${params.search_value}`;
-    }
-    if (params.search_type === 'Lucene' && params.lucene_where) {
-        statement = statement + ` AND (${params.lucene_where})`;
-    }
-    // ORDER BY 的 timeField 也加反引号
-    statement = statement + ` ORDER BY \`${params.timeField}\` DESC LIMIT ${+params.page_size} OFFSET ${(+(params === null || params === void 0 ? void 0 : params.page) - 1) * params.page_size} `;
-    return statement;
-}
-function getQueryTableChartsSQL(params) {
-    const indexes = params.indexes;
-    let statement = `SELECT ${params.interval}_FLOOR(table_per_time.T,${params.interval_value}) as TT,sum(table_per_time.cnt) FROM (SELECT ${params.interval}_FLOOR(${params.timeField}) as T,count(*) as cnt FROM \`${params.database}\`.\`${params.table}\` WHERE`;
-    if (indexes && params.search_type === 'Search') {
-        statement += ` (${indexes}) AND`;
-    }
-    statement += ` (\`${params.timeField}\` between '${params.startDate}' AND '${params.endDate}') `;
-    if (params.data_filters.length > 0) {
-        statement = params.data_filters.reduce((prev, curr)=>{
-            return addSqlFilter(prev, curr);
-        }, statement);
-    }
-    if (params.search_type === 'SQL' && params.search_value) {
-        statement = statement + ` ` + `AND ${params.search_value}`;
-    }
-    if (params.search_type === 'Lucene' && params.lucene_where) {
-        statement = statement + ` AND (${params.lucene_where})`;
-    }
-    statement = statement + ` ` + `GROUP BY T ORDER BY T) as table_per_time GROUP BY TT ORDER BY TT`;
-    return statement;
-}
-function getQueryTableResultCountSQL(params) {
-    const indexes = params.indexes;
-    let statement = `SELECT SUM(table_per_time.cnt) AS total_count
-        FROM (
-          SELECT ${params.interval}_FLOOR(${params.timeField}) as T, COUNT(*) as cnt
-          FROM \`${params.database}\`.\`${params.table}\`
-          WHERE`;
-    if (indexes && params.search_type === 'Search') {
-        statement += ` (${indexes}) AND`;
-    }
-    statement += ` (\`${params.timeField}\` between '${params.startDate}' AND '${params.endDate}')`;
-    if (params.data_filters.length > 0) {
-        statement = params.data_filters.reduce((prev, curr)=>{
-            return addSqlFilter(prev, curr);
-        }, statement);
-    }
-    if (params.search_type === 'SQL' && params.search_value) {
-        statement = statement + ` ` + `AND ${params.search_value}`;
-    }
-    if (params.search_type === 'Lucene' && params.lucene_where) {
-        statement = statement + ` AND (${params.lucene_where})`;
-    }
-    statement = statement + ` ` + `GROUP BY T) AS table_per_time;`;
-    return statement;
-}
-function getSurroundingSQL(params) {
-    let statement = `SELECT * FROM \`${params.database}\`.\`${params.table}\` WHERE`;
-    statement += ` (\`${params.timeField}\` ${params.operator} '${params.time}')`;
-    statement = params.data_filters.reduce((prev, curr)=>{
-        return addSqlFilter(prev, curr);
-    }, statement);
-    const orderSymbol = params.operator === '<' ? 'DESC' : 'ASC';
-    statement = statement + ` ` + `ORDER BY \`${params.timeField}\` ${orderSymbol} LIMIT ${+params.pageSize}`;
-    return statement;
-}
-function getFilterSQL({ fieldName, operator, value }) {
-    const valueString = value.map((e)=>{
-        if (typeof e === 'string') {
-            return `'${e}'`;
-        } else {
-            return e;
-        }
-    });
-    const transformedFieldName = transformFieldPath(fieldName);
-    if (operator === '=' || operator === '!=' || operator === 'like' || operator === 'not like' || operator === 'match_all' || operator === 'match_any' || operator === 'match_phrase' || operator === 'match_phrase_prefix') {
-        return `${transformedFieldName} ${operator} ${valueString[0]}`;
-    }
-    if (operator === 'is null' || operator === 'is not null') {
-        return `${transformedFieldName} ${operator}`;
-    }
-    if (operator === 'between' || operator === 'not between') {
-        return `${transformedFieldName} ${operator} ${valueString[0]} AND ${valueString[1]}`;
-    }
-    if (operator === 'in' || operator === 'not in') {
-        return `${transformedFieldName} ${operator} ('${valueString}')`;
-    }
-    return '';
-}
-function addSqlFilter(sql, dataFilterValue) {
-    let result = sql;
-    if (!sql.toUpperCase().includes('WHERE')) {
-        result += ' WHERE';
-    } else {
-        result += ' AND';
-    }
-    result += ` (${getFilterSQL(dataFilterValue)})`;
-    return result;
-}
-function transformFieldPath(fieldPath) {
-    const parts = fieldPath.split('.');
-    return parts[0] + parts.slice(1).map((part)=>`['${part}']`).join('');
-}
-
+// EXTERNAL MODULE: ./services/sql.ts
+var sql = __webpack_require__(4161);
 // EXTERNAL MODULE: ./components/with-error-handler/withErrorHandler.tsx
 var withErrorHandler = __webpack_require__(6472);
 ;// ./services/discover.ts
@@ -2830,7 +2740,7 @@ function getTableDataService(payload) {
     const { selectdbDS } = payload, rest = _object_without_properties(payload, [
         "selectdbDS"
     ]);
-    const QueryTableResultSQL = getQueryTableResultSQL(rest);
+    const QueryTableResultSQL = (0,sql/* getQueryTableResultSQL */.ij)(rest);
     const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
@@ -2855,7 +2765,7 @@ function getTableDataChartsService(payload) {
     const { selectdbDS } = payload, rest = _object_without_properties(payload, [
         "selectdbDS"
     ]);
-    const QueryTableChartsSQL = getQueryTableChartsSQL(rest);
+    const QueryTableChartsSQL = (0,sql/* getQueryTableChartsSQL */.sE)(rest);
     const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
@@ -2880,7 +2790,7 @@ function getTopDataService(payload) {
     const { selectdbDS } = payload, rest = _object_without_properties(payload, [
         "selectdbDS"
     ]);
-    const QueryTableResultSQL = getQueryTableResultSQL(rest);
+    const QueryTableResultSQL = (0,sql/* getQueryTableResultSQL */.ij)(rest);
     const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
@@ -2905,7 +2815,7 @@ function getTableDataCountService(payload) {
     const { selectdbDS } = payload, rest = _object_without_properties(payload, [
         "selectdbDS"
     ]);
-    const QueryTableResultCountSQL = getQueryTableResultCountSQL(rest);
+    const QueryTableResultCountSQL = (0,sql/* getQueryTableResultCountSQL */.jY)(rest);
     const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
@@ -2930,7 +2840,7 @@ function getSurroundingDataService(payload) {
     const { selectdbDS } = payload, rest = _object_without_properties(payload, [
         "selectdbDS"
     ]);
-    const surroundingSQL = getSurroundingSQL(rest);
+    const surroundingSQL = (0,sql/* getSurroundingSQL */.bF)(rest);
     const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
@@ -2965,10 +2875,11 @@ var utils = __webpack_require__(2551);
 
 
 function SurroundingContentTableActions({ fieldName, fieldValue }) {
+    var _tableFields_find;
     // const [selectedSurroundingFields, setSelectedSurroundingFields] = useAtom(surroundingSelectedFieldsAtom);
     const [surroundingDataFilter, setSurroundingDataFilter] = (0,react/* useAtom */.fp)(discover/* surroundingDataFilterAtom */.wc);
     const tableFields = (0,react/* useAtomValue */.md)(discover/* tableFieldsAtom */.D_);
-    const fieldType = tableFields.find((field)=>field.Field === fieldName).Type;
+    const fieldType = (_tableFields_find = tableFields.find((field)=>field.Field === fieldName)) === null || _tableFields_find === void 0 ? void 0 : _tableFields_find.Type;
     // const hasField = selectedSurroundingFields.some((item: any) => item.Field === fieldName);
     // const filterValue = typeof fieldValue === 'object' ? JSON.stringify(fieldValue) : fieldValue;
     return /*#__PURE__*/ external_react_default().createElement((external_react_default()).Fragment, null, /*#__PURE__*/ external_react_default().createElement("div", {
@@ -3148,6 +3059,7 @@ function SurroundingLogs() {
     const [afterTimeFieldPageSize, setAfterTimeFieldPageSize] = (0,react/* useAtom */.fp)(discover/* afterTimeFieldPageSizeAtom */.NJ);
     const [beforeTime, setBeforeTime] = (0,react/* useAtom */.fp)(discover/* beforeTimeAtom */.uz);
     const [afterTime, setAfterTime] = (0,react/* useAtom */.fp)(discover/* afterTimeAtom */.ps);
+    const tableFields = (0,react/* useAtomValue */.md)(discover/* tableFieldsAtom */.D_);
     const [state, updateState] = (0,external_react_.useState)([
         {
             label: 'Table',
@@ -3184,7 +3096,7 @@ function SurroundingLogs() {
         manual: true,
         onSuccess: (res, params)=>_async_to_generator(function*() {
                 if (res.ok) {
-                    const rowsData = (0,utils_data/* convertColumnToRow */.HL)(res.data.results.getSurroundingData.frames[0]);
+                    const rowsData = (0,utils_data/* convertColumnToRowViaFieldsType */.ml)(res.data.results.getSurroundingData.frames[0], tableFields);
                     const result = getAfterResultWrap(generateSurroundingResult(rowsData, currentTimeField));
                     let data = [
                         ...surroundingTableData
@@ -3230,7 +3142,7 @@ function SurroundingLogs() {
         manual: true,
         onSuccess: (res, params)=>_async_to_generator(function*() {
                 if (res.ok) {
-                    const rowsData = (0,utils_data/* convertColumnToRow */.HL)(res.data.results.getSurroundingData.frames[0]);
+                    const rowsData = (0,utils_data/* convertColumnToRowViaFieldsType */.ml)(res.data.results.getSurroundingData.frames[0], tableFields);
                     const result = generateSurroundingResult(rowsData, currentTimeField);
                     let data = [
                         ...surroundingTableData
@@ -3276,8 +3188,8 @@ function SurroundingLogs() {
         ],
         onSuccess: (res)=>_async_to_generator(function*() {
                 if (res[0].ok && res[1].ok) {
-                    const rowsData1 = (0,utils_data/* convertColumnToRow */.HL)(res[0].data.results.getSurroundingData.frames[0]);
-                    const rowsData2 = (0,utils_data/* convertColumnToRow */.HL)(res[1].data.results.getSurroundingData.frames[0]);
+                    const rowsData1 = (0,utils_data/* convertColumnToRowViaFieldsType */.ml)(res[0].data.results.getSurroundingData.frames[0], tableFields);
+                    const rowsData2 = (0,utils_data/* convertColumnToRowViaFieldsType */.ml)(res[1].data.results.getSurroundingData.frames[0], tableFields);
                     const result1 = generateSurroundingResult(rowsData1, currentTimeField);
                     const result2 = getAfterResultWrap(generateSurroundingResult(rowsData2, currentTimeField));
                     const selectedResult = generateSurroundingResult([
@@ -3364,66 +3276,7 @@ function SurroundingLogs() {
         return null;
     };
     const renderSubComponent = ({ row })=>{
-        // processObject copied/adapted from discover-content to normalize stringified JSON inside fields
-        const processObject = (obj)=>{
-            if (typeof obj !== 'object' || obj === null) {
-                return obj;
-            }
-            const result = {};
-            for(const key in obj){
-                if (obj.hasOwnProperty(key)) {
-                    let value = obj[key];
-                    if (typeof value === 'string') {
-                        let cleanValue = value.trim();
-                        // check for escaped double quotes
-                        if (cleanValue.includes('\\"')) {
-                            try {
-                                cleanValue = JSON.parse(`"${cleanValue}"`);
-                            } catch (e) {
-                            // if parsing fails, keep the original value
-                            }
-                        }
-                        // check for JSON
-                        if (cleanValue.startsWith('{') && cleanValue.endsWith('}') || cleanValue.startsWith('[') && cleanValue.endsWith(']')) {
-                            try {
-                                const parsed = JSON.parse(cleanValue);
-                                value = processObject(parsed);
-                            } catch (e) {
-                                value = obj[key];
-                            }
-                        } else {
-                            value = obj[key];
-                        }
-                    } else if (Array.isArray(value)) {
-                        value = value.map((item)=>{
-                            if (typeof item === 'string') {
-                                let cleanItem = item.trim();
-                                if (cleanItem.includes('\\"')) {
-                                    try {
-                                        cleanItem = JSON.parse(`"${cleanItem}"`);
-                                    } catch (e) {}
-                                }
-                                if (cleanItem.startsWith('{') && cleanItem.endsWith('}') || cleanItem.startsWith('[') && cleanItem.endsWith(']')) {
-                                    try {
-                                        const parsed = JSON.parse(cleanItem);
-                                        return processObject(parsed);
-                                    } catch (unused) {
-                                        return item;
-                                    }
-                                }
-                                return item;
-                            }
-                            return typeof item === 'object' && item !== null ? processObject(item) : item;
-                        });
-                    } else if (typeof value === 'object' && value !== null) {
-                        value = processObject(value);
-                    }
-                    result[key] = value;
-                }
-            }
-            return result;
-        };
-        const processedData = processObject(row.original._original);
+        const processedData = (0,utils_data/* parseJsonLikeValue */.mt)(row.original._original);
         const subTableData = Object.keys(processedData).map((key)=>{
             return {
                 field: key,
@@ -3451,11 +3304,8 @@ function SurroundingLogs() {
         })), /*#__PURE__*/ external_react_default().createElement(ui_.TabContent, null, state[0].active && /*#__PURE__*/ external_react_default().createElement("table", {
             className: "bg-b1/20 pl-4 backdrop-blur-md dark:bg-n9/60"
         }, /*#__PURE__*/ external_react_default().createElement("tbody", null, subTableData.map((item)=>{
-            let fieldValue = item.value;
+            const fieldValue = (0,utils_data/* formatFieldDisplayValue */.xW)(item.value, 'compact');
             const fieldName = item.field;
-            if (typeof fieldValue === 'object') {
-                fieldValue = JSON.stringify(fieldValue);
-            }
             const tableRowStyle = (0,css_.css)`
                                         &:hover {
                                             .filter-table-content {
@@ -3484,7 +3334,7 @@ function SurroundingLogs() {
                 className: "h-8 whitespace-normal text-xs"
             }, /*#__PURE__*/ external_react_default().createElement("div", {
                 className: "w-full break-all"
-            }, fieldValue || '-')));
+            }, fieldValue)));
         }))), state[1].active && /*#__PURE__*/ external_react_default().createElement("div", null, /*#__PURE__*/ external_react_default().createElement("pre", {
             className: (0,css_.css)`
                                     padding: 16px;
@@ -3500,19 +3350,15 @@ function SurroundingLogs() {
                                     max-height: 400px;
                                     overflow-y: auto;
                                 `
-        }, JSON.stringify(processedData, null, 2)))));
+        }, (0,utils_data/* formatFieldDisplayValue */.xW)(processedData, 'pretty')))));
     };
     function generateSurroundingResult(result, timeField) {
         const sortedResult = (0,sortBy/* default */.A)(result, timeField);
         const _sourceResult = sortedResult.map((item)=>{
             let itemSource = '';
             for(const key in item){
-                let highlightValue = item[key];
-                // 兼容 Variant 类型
-                if (typeof highlightValue === 'object') {
-                    highlightValue = JSON.stringify(highlightValue);
-                }
-                itemSource += `<span style="background-color: ${theme.isDark ? '#3F3F4F' : '#BED8FD'} ; padding: 0px 4px 2px; margin-right: 4px; border-radius: 4px;">${key}:</span>${highlightValue} `;
+                const highlightValue = (0,utils_data/* formatFieldDisplayValue */.xW)(item[key], 'compact');
+                itemSource += `<span style="background-color: ${theme.isDark ? '#3F3F4F' : '#BED8FD'} ; padding: 0px 4px 2px; margin-right: 4px; border-radius: 4px;">${(0,utils_data/* escapeHtml */.ZD)(key)}:</span>${(0,utils_data/* escapeHtml */.ZD)(highlightValue)} `;
             }
             return {
                 _original: item,
@@ -3630,12 +3476,9 @@ function SurroundingLogs() {
                             })),
                         cell: ({ row, getValue })=>{
                             // let fieldValue = row.original._original[field.Field];
-                            let fieldValue = (0,get/* default */.A)(row.original._original, field.Field);
+                            const fieldValue = (0,utils_data/* formatFieldDisplayValue */.xW)((0,get/* default */.A)(row.original._original, field.Field), 'compact');
                             const fieldName = field.Field;
                             const fieldType = field.Type;
-                            if (typeof fieldValue === 'object') {
-                                fieldValue = JSON.stringify(fieldValue);
-                            }
                             return /*#__PURE__*/ external_react_default().createElement("div", {
                                 className: `${HoverStyle} ${(0,css_.css)`
                                         display: flex;
@@ -3716,8 +3559,8 @@ function SurroundingLogs() {
     })));
 }
 
-// EXTERNAL MODULE: ./components/trace-detail/index.tsx
-var trace_detail = __webpack_require__(1885);
+// EXTERNAL MODULE: ./components/trace-detail/index.tsx + 1 modules
+var trace_detail = __webpack_require__(879);
 // EXTERNAL MODULE: external "@grafana/data"
 var data_ = __webpack_require__(7781);
 // EXTERNAL MODULE: ./types/plugin-settings.ts
@@ -3850,10 +3693,11 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
     const discoverCurrent = (0,react/* useAtomValue */.md)(discover/* discoverCurrentAtom */.WN);
     const currentDatasource = (0,react/* useAtomValue */.md)(discover/* selectedDatasourceAtom */.SW);
     const tableFields = (0,react/* useAtomValue */.md)(discover/* tableFieldsAtom */.D_);
+    const [discoverRowsExpanded, setDiscoverRowsExpanded] = (0,react/* useAtom */.fp)(discover/* discoverRowsExpandedAtom */.Ps);
     const context = (0,data_.usePluginContext)();
     // user settings
     const jsonData = context.meta.jsonData || {};
-    const logsConfig = (0,plugin_settings/* mergeLogsConfig */.o)(jsonData.logsConfig);
+    const logsConfig = (0,plugin_settings/* mergeLogsConfig */.oW)(jsonData.logsConfig);
     const { database = '', datasource, logsTable = '', targetTraceTable = '' } = logsConfig;
     // local input state for page-jump control
     const [jumpPage, setJumpPage] = (0,external_react_.useState)(String(page));
@@ -3917,66 +3761,7 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
         setSelectedFields
     ]);
     const renderSubComponent = ({ row })=>{
-        // process object
-        const processObject = (obj)=>{
-            if (typeof obj !== 'object' || obj === null) {
-                return obj;
-            }
-            const result = {};
-            for(const key in obj){
-                if (obj.hasOwnProperty(key)) {
-                    let value = obj[key];
-                    if (typeof value === 'string') {
-                        let cleanValue = value.trim();
-                        // check for escaped double quotes
-                        if (cleanValue.includes('\\"')) {
-                            try {
-                                cleanValue = JSON.parse(`"${cleanValue}"`);
-                            } catch (e) {
-                            // if parsing fails, keep the original value
-                            }
-                        }
-                        // check for JSON
-                        if (cleanValue.startsWith('{') && cleanValue.endsWith('}') || cleanValue.startsWith('[') && cleanValue.endsWith(']')) {
-                            try {
-                                const parsed = JSON.parse(cleanValue);
-                                value = processObject(parsed);
-                            } catch (e) {
-                                value = obj[key];
-                            }
-                        } else {
-                            value = obj[key];
-                        }
-                    } else if (Array.isArray(value)) {
-                        value = value.map((item)=>{
-                            if (typeof item === 'string') {
-                                let cleanItem = item.trim();
-                                if (cleanItem.includes('\\"')) {
-                                    try {
-                                        cleanItem = JSON.parse(`"${cleanItem}"`);
-                                    } catch (e) {}
-                                }
-                                if (cleanItem.startsWith('{') && cleanItem.endsWith('}') || cleanItem.startsWith('[') && cleanItem.endsWith(']')) {
-                                    try {
-                                        const parsed = JSON.parse(cleanItem);
-                                        return processObject(parsed);
-                                    } catch (unused) {
-                                        return item;
-                                    }
-                                }
-                                return item;
-                            }
-                            return typeof item === 'object' && item !== null ? processObject(item) : item;
-                        });
-                    } else if (typeof value === 'object' && value !== null) {
-                        value = processObject(value);
-                    }
-                    result[key] = value;
-                }
-            }
-            return result;
-        };
-        const processedData = processObject(row.original._original);
+        const processedData = (0,utils_data/* parseJsonLikeValue */.mt)(row.original._original);
         const subTableData = Object.keys(processedData).map((key)=>{
             return {
                 field: key,
@@ -4011,11 +3796,8 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
                                 ${theme.isDark ? 'background-color: hsl(var(--n9) / 0.6);' : 'background-color: hsl(var(--b1) / 0.2)'}
                             `
         }, /*#__PURE__*/ external_react_default().createElement("tbody", null, subTableData.map((item)=>{
-            let fieldValue = item.value;
+            const fieldValue = (0,utils_data/* formatFieldDisplayValue */.xW)(item.value, 'compact');
             const fieldName = item.field;
-            if (typeof fieldValue === 'object') {
-                fieldValue = JSON.stringify(fieldValue);
-            }
             const tableRowStyle = (0,css_.css)`
                                         &:hover {
                                             .filter-table-content {
@@ -4054,7 +3836,7 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
                                                         width: 100%;
                                                         word-break: break-all;
                                                     `
-            }, fieldValue || '-')));
+            }, fieldValue)));
         }))), state[1].active && /*#__PURE__*/ external_react_default().createElement("div", null, /*#__PURE__*/ external_react_default().createElement("pre", {
             className: (0,css_.css)`
                                     padding: 16px;
@@ -4070,7 +3852,7 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
                                     max-height: 400px;
                                     overflow-y: auto;
                                 `
-        }, JSON.stringify(processedData, null, 2)))), /*#__PURE__*/ external_react_default().createElement(tooltip/* default */.A, {
+        }, (0,utils_data/* formatFieldDisplayValue */.xW)(processedData, 'pretty')))), /*#__PURE__*/ external_react_default().createElement(tooltip/* default */.A, {
             title: "Surrounding Items will ignore the existing interface's filter conditions and view the context through time."
         }, /*#__PURE__*/ external_react_default().createElement("a", {
             onClick: ()=>{
@@ -4255,12 +4037,9 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
                             })),
                         cell: ({ row, getValue })=>{
                             // let fieldValue = row.original._original[field.Field];
-                            let fieldValue = (0,get/* default */.A)(row.original._original, field.Field);
+                            const fieldValue = (0,utils_data/* formatFieldDisplayValue */.xW)((0,get/* default */.A)(row.original._original, field.Field), 'compact');
                             const fieldName = field.Field;
                             const fieldType = field.Type;
-                            if (typeof fieldValue === 'object') {
-                                fieldValue = JSON.stringify(fieldValue);
-                            }
                             return /*#__PURE__*/ external_react_default().createElement("div", {
                                 className: `${HoverStyle} ${(0,css_.css)`
                                         display: flex;
@@ -4331,7 +4110,10 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
         data: fields,
         columns: columns,
         getRowCanExpand: ()=>true,
-        renderSubComponent: renderSubComponent
+        renderSubComponent: renderSubComponent,
+        showExpandAllToggle: true,
+        allRowsExpanded: discoverRowsExpanded,
+        onAllRowsExpandedChange: setDiscoverRowsExpanded
     }), /*#__PURE__*/ external_react_default().createElement("div", {
         className: (0,css_.css)`
                     display: flex;
@@ -4622,608 +4404,6 @@ function SQLSearch({ style, onQuerying }) {
 
 // EXTERNAL MODULE: ./services/metaservice.ts
 var metaservice = __webpack_require__(8161);
-;// ./components/discover-header/lucene.tsx
-
-
-
-
-
-
-function Lucene({ onQuerying }) {
-    const [searchValue, setSearchValue] = (0,react/* useAtom */.fp)(discover/* searchValueAtom */.P8);
-    if (false) // removed by dead control flow
-{}
-    return /*#__PURE__*/ external_react_default().createElement(ui_.Input, {
-        value: searchValue,
-        onChange: (e)=>{
-            var _e_target;
-            setSearchValue((_e_target = e.target) === null || _e_target === void 0 ? void 0 : _e_target.value);
-        },
-        onKeyDown: (e)=>{
-            const native = e.nativeEvent;
-            if (e.key === 'Enter' && !(native && native.isComposing)) {
-                try {
-                    onQuerying === null || onQuerying === void 0 ? void 0 : onQuerying();
-                } catch (err) {
-                    (0,runtime_.logError)((0,errors/* toError */.i)(err), {
-                        source: 'Lucene',
-                        action: 'onQuerying'
-                    });
-                }
-            }
-        },
-        placeholder: "usage: field:value AND field2:value2"
-    });
-}
-
-;// ./components/discover-header/index.tsx
-'use client';
-function discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-    try {
-        var info = gen[key](arg);
-        var value = info.value;
-    } catch (error) {
-        reject(error);
-        return;
-    }
-    if (info.done) {
-        resolve(value);
-    } else {
-        Promise.resolve(value).then(_next, _throw);
-    }
-}
-function discover_header_async_to_generator(fn) {
-    return function() {
-        var self = this, args = arguments;
-        return new Promise(function(resolve, reject) {
-            var gen = fn.apply(self, args);
-            function _next(value) {
-                discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-            }
-            function _throw(err) {
-                discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-            }
-            _next(undefined);
-        });
-    };
-}
-function discover_header_define_property(obj, key, value) {
-    if (key in obj) {
-        Object.defineProperty(obj, key, {
-            value: value,
-            enumerable: true,
-            configurable: true,
-            writable: true
-        });
-    } else {
-        obj[key] = value;
-    }
-    return obj;
-}
-function discover_header_object_spread(target) {
-    for(var i = 1; i < arguments.length; i++){
-        var source = arguments[i] != null ? arguments[i] : {};
-        var ownKeys = Object.keys(source);
-        if (typeof Object.getOwnPropertySymbols === "function") {
-            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
-                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-            }));
-        }
-        ownKeys.forEach(function(key) {
-            discover_header_define_property(target, key, source[key]);
-        });
-    }
-    return target;
-}
-function discover_header_ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-    if (Object.getOwnPropertySymbols) {
-        var symbols = Object.getOwnPropertySymbols(object);
-        if (enumerableOnly) {
-            symbols = symbols.filter(function(sym) {
-                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-            });
-        }
-        keys.push.apply(keys, symbols);
-    }
-    return keys;
-}
-function discover_header_object_spread_props(target, source) {
-    source = source != null ? source : {};
-    if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-        discover_header_ownKeys(Object(source)).forEach(function(key) {
-            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-    }
-    return target;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getStoredValue(key) {
-    if (typeof window === 'undefined') {
-        return undefined;
-    }
-    try {
-        const raw = window.localStorage.getItem(key);
-        if (!raw) {
-            return undefined;
-        }
-        return JSON.parse(raw);
-    } catch (unused) {
-        return undefined;
-    }
-}
-function resolveDatasourceUid(dataSource) {
-    if (!dataSource) {
-        return '';
-    }
-    if (typeof dataSource === 'string') {
-        const matched = (0,runtime_.getDataSourceSrv)().getList().find((ds)=>ds.uid === dataSource || ds.name === dataSource);
-        return (matched === null || matched === void 0 ? void 0 : matched.uid) || dataSource;
-    }
-    if (typeof dataSource === 'object') {
-        if (dataSource.uid) {
-            return dataSource.uid;
-        }
-        if (dataSource.name) {
-            const matched = (0,runtime_.getDataSourceSrv)().getList().find((ds)=>ds.name === dataSource.name);
-            return (matched === null || matched === void 0 ? void 0 : matched.uid) || '';
-        }
-    }
-    return '';
-}
-function DiscoverHeader(props) {
-    // const catalog = 'internal';
-    // const catalogs = useAtomValue(catalogAtom);
-    const setIndexes = (0,react/* useSetAtom */.Xr)(discover/* indexesAtom */.Eq);
-    // const setSearchType = useSetAtom(searchTypeAtom);
-    const [discoverCurrent, setDiscoverCurrent] = (0,react/* useAtom */.fp)(discover/* discoverCurrentAtom */.WN);
-    if (false) // removed by dead control flow
-{}
-    const [_loc, setLoc] = (0,react/* useAtom */.fp)(discover/* locationAtom */.JT);
-    // const [currentCluster, setCurrentCluster] = useAtom(currentClusterAtom);
-    // const setTableFields = useSetAtom(tableFieldsAtom);
-    const setTableFields = (0,react/* useSetAtom */.Xr)(discover/* tableFieldsAtom */.D_);
-    const [timeFields, setTimeFields] = (0,react/* useAtom */.fp)(discover/* timeFieldsAtom */.Gg);
-    const [_currentDate, setCurrentDate] = (0,react/* useAtom */.fp)(discover/* currentDateAtom */.Zb);
-    const currentTimeField = (0,react/* useAtomValue */.md)(discover/* currentTimeFieldAtom */.CA);
-    const [, setCurrentIndex] = (0,react/* useAtom */.fp)(discover/* currentIndexAtom */.TY);
-    const searchFocus = (0,react/* useAtomValue */.md)(discover/* searchFocusAtom */.MM);
-    // const { databaseList } = useDatabaseList();
-    const [activeItem, _setActiveItem] = (0,react/* useAtom */.fp)(discover/* activeShortcutAtom */.m_);
-    // const [clusters, setClusters] = useState<any[]>([]);
-    // const database = loc.searchParams?.get('database');
-    // const table = loc.searchParams?.get('table');
-    // const cluster = loc.searchParams?.get('cluster');
-    // const startTime = loc.searchParams?.get('startTime');
-    // const endTime = loc.searchParams?.get('endTime');
-    const [selectedDatasource, setSelectedDatasource] = (0,react/* useAtom */.fp)(discover/* selectedDatasourceAtom */.SW);
-    const [timeRange, setTimeRange] = (0,react/* useAtom */.fp)(discover/* timeRangeAtom */.U9);
-    const [currentTable, setCurrentTable] = (0,react/* useAtom */.fp)(discover/* currentTableAtom */.$w);
-    const [databases, setDatabases] = (0,react/* useAtom */.fp)(discover/* databasesAtom */.SK);
-    const [tables, setTables] = (0,react/* useAtom */.fp)(discover/* tablesAtom */.b9);
-    const [_datasources] = (0,react/* useAtom */.fp)(discover/* datasourcesAtom */.ui);
-    const searchType = (0,react/* useAtomValue */.md)(discover/* searchTypeAtom */.WM);
-    const searchMode = searchType === 'Search';
-    const selectdbDS = (0,react/* useAtomValue */.md)(discover/* selectedDatasourceAtom */.SW);
-    const theme = (0,ui_.useTheme2)();
-    const context = (0,data_.usePluginContext)();
-    const jsonData = context.meta.jsonData || {};
-    const logsConfig = (0,plugin_settings/* mergeLogsConfig */.o)(jsonData.logsConfig);
-    const fetchDatabases = external_react_default().useCallback((ds)=>{
-        if (!ds) {
-            return undefined;
-        }
-        return (0,metaservice/* getDatabases */.Hm)(ds).subscribe({
-            next: (resp)=>{
-                const { data, ok } = resp;
-                if (ok) {
-                    const frame = (0,data_.toDataFrame)(data.results.getDatabases.frames[0]);
-                    const values = Array.from(frame.fields[0].values);
-                    const options = values.map((item)=>({
-                            label: item,
-                            value: item
-                        }));
-                    setDatabases(options);
-                }
-            },
-            error: (err)=>(0,runtime_.logError)((0,errors/* toError */.i)(err), {
-                    source: 'DiscoverHeader',
-                    action: 'fetchDatabases'
-                })
-        });
-    }, [
-        setDatabases
-    ]);
-    (0,external_react_.useEffect)(()=>{
-        if (!selectdbDS) {
-            return;
-        }
-        const subscription = fetchDatabases(selectdbDS);
-        return ()=>subscription === null || subscription === void 0 ? void 0 : subscription.unsubscribe();
-    }, [
-        selectdbDS,
-        fetchDatabases
-    ]);
-    function getFields(selectedTable, initOptions) {
-        var _ref, _ref1;
-        const effectiveDatasource = (_ref = initOptions === null || initOptions === void 0 ? void 0 : initOptions.datasource) !== null && _ref !== void 0 ? _ref : selectdbDS;
-        const effectiveDatabase = (_ref1 = initOptions === null || initOptions === void 0 ? void 0 : initOptions.database) !== null && _ref1 !== void 0 ? _ref1 : discoverCurrent.database;
-        if (!effectiveDatasource || !effectiveDatabase || !(selectedTable === null || selectedTable === void 0 ? void 0 : selectedTable.value)) {
-            return;
-        }
-        (0,metaservice/* getFieldsService */.H1)({
-            selectdbDS: effectiveDatasource,
-            database: effectiveDatabase,
-            table: selectedTable.value
-        }).subscribe({
-            next: ({ data, ok })=>{
-                if (ok) {
-                    const frame = (0,data_.toDataFrame)(data.results.getFields.frames[0]);
-                    const values = Array.from(frame.fields[0].values);
-                    const fieldTypes = Array.from(frame.fields[1].values);
-                    const tableFields = values.map((item, index)=>{
-                        return {
-                            label: item,
-                            Field: item,
-                            value: item,
-                            Type: fieldTypes[index]
-                        };
-                    });
-                    setTableFields(tableFields);
-                    if (values) {
-                        var _ref, _ref1;
-                        var _options_, _initOptions_onResolved;
-                        const options = values.filter((field, index)=>{
-                            return (0,utils_data/* isValidTimeFieldType */.Q3)(fieldTypes[index].toUpperCase());
-                        }).map((item)=>{
-                            return {
-                                label: item,
-                                value: item
-                            };
-                        });
-                        const preferredTimeField = ((_ref = (_ref1 = initOptions === null || initOptions === void 0 ? void 0 : initOptions.preferredTimeField) !== null && _ref1 !== void 0 ? _ref1 : currentTimeField) !== null && _ref !== void 0 ? _ref : '').trim();
-                        const targetTimeField = preferredTimeField || ((_options_ = options[0]) === null || _options_ === void 0 ? void 0 : _options_.value) || '';
-                        setDiscoverCurrent((prev)=>discover_header_object_spread_props(discover_header_object_spread({}, prev), {
-                                database: effectiveDatabase,
-                                table: selectedTable.value,
-                                timeField: targetTimeField || prev.timeField
-                            }));
-                        setTimeFields(options);
-                        initOptions === null || initOptions === void 0 ? void 0 : (_initOptions_onResolved = initOptions.onResolved) === null || _initOptions_onResolved === void 0 ? void 0 : _initOptions_onResolved.call(initOptions, targetTimeField);
-                    }
-                }
-            },
-            error: (err)=>{
-                (0,runtime_.logError)((0,errors/* toError */.i)(err), {
-                    source: 'DiscoverHeader',
-                    action: 'getFields'
-                });
-            }
-        });
-    }
-    function getIndexes(selectedTable, initOptions) {
-        var _ref, _ref1;
-        const effectiveDatasource = (_ref = initOptions === null || initOptions === void 0 ? void 0 : initOptions.datasource) !== null && _ref !== void 0 ? _ref : selectdbDS;
-        const effectiveDatabase = (_ref1 = initOptions === null || initOptions === void 0 ? void 0 : initOptions.database) !== null && _ref1 !== void 0 ? _ref1 : discoverCurrent.database;
-        if (!effectiveDatasource || !effectiveDatabase || !(selectedTable === null || selectedTable === void 0 ? void 0 : selectedTable.value)) {
-            return;
-        }
-        (0,metaservice/* getIndexesService */.s1)({
-            selectdbDS: effectiveDatasource,
-            database: effectiveDatabase,
-            table: selectedTable.value
-        }).subscribe({
-            next: ({ data, ok })=>{
-                if (ok) {
-                    const frame = (0,data_.toDataFrame)(data.results.getIndexes.frames[0]);
-                    const values = Array.from(frame.fields[2].values);
-                    const columnNames = Array.from(frame.fields[4].values);
-                    const indexesTypes = Array.from(frame.fields[10].values);
-                    if (!values || values.length === 0) {
-                        setIndexes([]);
-                        setCurrentIndex([]);
-                        return;
-                    }
-                    const tableIndexes = values === null || values === void 0 ? void 0 : values.map((item, index)=>{
-                        return {
-                            label: item,
-                            value: item,
-                            type: indexesTypes[index],
-                            columnName: columnNames[index]
-                        };
-                    });
-                    setIndexes(tableIndexes);
-                    if (tableIndexes) {
-                        setCurrentIndex(tableIndexes);
-                    }
-                }
-            },
-            error: (err)=>{
-                (0,runtime_.logError)((0,errors/* toError */.i)(err), {
-                    source: 'DiscoverHeader',
-                    action: 'getIndexes'
-                });
-            }
-        });
-    }
-    function initHeaderData() {
-        return discover_header_async_to_generator(function*() {
-            const persistedDatasourceStorage = getStoredValue('discover-selected-datasource');
-            const persistedDiscoverCurrentStorage = getStoredValue('discover-current');
-            const persistedTableStorage = getStoredValue('discover-current-table');
-            const configuredDatasourceUid = resolveDatasourceUid(logsConfig.datasource);
-            const persistedDatasourceUid = (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) || (persistedDatasourceStorage === null || persistedDatasourceStorage === void 0 ? void 0 : persistedDatasourceStorage.uid);
-            const persistedDatabase = discoverCurrent.database || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.database) || '';
-            const persistedTable = currentTable || persistedTableStorage || discoverCurrent.table || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.table) || '';
-            const persistedTimeField = discoverCurrent.timeField || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.timeField) || '';
-            const defaultDatasourceUid = persistedDatasourceUid || configuredDatasourceUid || '';
-            const defaultDatabase = persistedDatabase || logsConfig.database || '';
-            const defaultLogsTable = persistedTable || logsConfig.logsTable || '';
-            if (!defaultDatasourceUid || !defaultDatabase) {
-                return;
-            }
-            try {
-                const ds = (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) === defaultDatasourceUid ? selectedDatasource : yield (0,runtime_.getDataSourceSrv)().get({
-                    uid: defaultDatasourceUid
-                });
-                if (!ds) {
-                    return;
-                }
-                if ((selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) !== defaultDatasourceUid) {
-                    setSelectedDatasource(ds);
-                }
-                fetchDatabases(ds);
-                (0,metaservice/* getTablesService */.Rw)({
-                    selectdbDS: ds,
-                    database: defaultDatabase
-                }).subscribe({
-                    next: (resp)=>{
-                        const { data, ok } = resp;
-                        if (ok) {
-                            var _options_find, _options_;
-                            const frame = (0,data_.toDataFrame)(data.results.getTables.frames[0]);
-                            const values = Array.from(frame.fields[0].values);
-                            const options = values.map((item)=>({
-                                    label: item,
-                                    value: item
-                                }));
-                            const targetTable = ((_options_find = options.find((option)=>option.value === defaultLogsTable)) === null || _options_find === void 0 ? void 0 : _options_find.value) || ((_options_ = options[0]) === null || _options_ === void 0 ? void 0 : _options_.value) || '';
-                            setTables(options);
-                            setCurrentTable(targetTable);
-                            setDiscoverCurrent((prev)=>discover_header_object_spread_props(discover_header_object_spread({}, prev), {
-                                    database: defaultDatabase,
-                                    table: targetTable
-                                }));
-                            if (targetTable) {
-                                getFields({
-                                    value: targetTable
-                                }, {
-                                    datasource: ds,
-                                    database: defaultDatabase,
-                                    preferredTimeField: persistedTimeField
-                                });
-                                getIndexes({
-                                    value: targetTable
-                                }, {
-                                    datasource: ds,
-                                    database: defaultDatabase
-                                });
-                            }
-                        }
-                    },
-                    error: (err)=>(0,runtime_.logError)((0,errors/* toError */.i)(err), {
-                            source: 'DiscoverHeader',
-                            action: 'getTables'
-                        })
-                });
-            } catch (error) {
-                (0,runtime_.logError)((0,errors/* toError */.i)(error), {
-                    source: 'DiscoverHeader',
-                    action: 'initHeaderData'
-                });
-            }
-        })();
-    }
-    (0,external_react_.useEffect)(()=>{
-        void initHeaderData();
-    // We only want to apply plugin-config defaults once when the page mounts.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    return /*#__PURE__*/ external_react_default().createElement("div", {
-        className: (0,css_.css)`
-                padding: 1rem;
-                padding-top: 1.5rem;
-                background-color: ${theme.isDark ? 'rgb(24, 27, 31)' : '#FFF'};
-                display: flex;
-                border-radius: 0.25rem 0.25rem 0 0;
-            `
-    }, /*#__PURE__*/ external_react_default().createElement(DiscoverHeaderSearch, {
-        className: "h-8 rounded border border-solid border-n9 dark:border-n7"
-    }, /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: "Datasource"
-    }, /*#__PURE__*/ external_react_default().createElement(runtime_.DataSourcePicker, {
-        width: 20,
-        type: 'mysql',
-        current: selectedDatasource,
-        placeholder: "Choose",
-        noDefault: true,
-        filter: (ds)=>ds.type === 'mysql',
-        onChange: (item)=>{
-            setSelectedDatasource(item);
-            // Always fetch databases even if the same datasource is selected
-            fetchDatabases(item);
-        }
-    })), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: "Database",
-        style: {
-            marginLeft: 8
-        }
-    }, /*#__PURE__*/ external_react_default().createElement(ui_.Select, {
-        width: 15,
-        options: databases,
-        value: discoverCurrent.database,
-        onChange: (selectedDatabase)=>{
-            setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
-                database: selectedDatabase.value
-            }));
-            (0,metaservice/* getTablesService */.Rw)({
-                selectdbDS,
-                database: selectedDatabase.value
-            }).subscribe({
-                next: (resp)=>{
-                    const { data, ok } = resp;
-                    if (ok) {
-                        const frame = (0,data_.toDataFrame)(data.results.getTables.frames[0]);
-                        const values = Array.from(frame.fields[0].values);
-                        const options = values.map((item)=>({
-                                label: item,
-                                value: item
-                            }));
-                        setTables(options);
-                    }
-                },
-                error: (err)=>(0,runtime_.logError)((0,errors/* toError */.i)(err), {
-                        source: 'DiscoverHeader',
-                        action: 'getTables'
-                    })
-            });
-        }
-    })), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: "Table",
-        style: {
-            marginLeft: 8
-        }
-    }, /*#__PURE__*/ external_react_default().createElement(ui_.Select, {
-        options: tables,
-        width: 15,
-        value: currentTable,
-        onChange: (selectedTable)=>{
-            setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
-                table: selectedTable.value
-            }));
-            setCurrentTable(selectedTable.value);
-            getFields(selectedTable);
-            getIndexes(selectedTable);
-        }
-    })), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: "Mode",
-        style: {
-            marginLeft: 8,
-            marginRight: 8,
-            width: '120px'
-        }
-    }, /*#__PURE__*/ external_react_default().createElement(SearchType, null)), searchType === 'Lucene' ? /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: "Lucene",
-        style: {
-            width: '100%'
-        }
-    }, /*#__PURE__*/ external_react_default().createElement(Lucene, {
-        onQuerying: ()=>props === null || props === void 0 ? void 0 : props.onQuerying()
-    })) : /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: searchMode ? 'Search' : 'SQL',
-        style: {
-            width: '100%'
-        }
-    }, /*#__PURE__*/ external_react_default().createElement(SQLSearch, {
-        style: {
-            flex: '1'
-        },
-        onQuerying: ()=>{
-            props === null || props === void 0 ? void 0 : props.onQuerying();
-        }
-    }))), !searchFocus && /*#__PURE__*/ external_react_default().createElement((external_react_default()).Fragment, null, /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: "Time Field"
-    }, /*#__PURE__*/ external_react_default().createElement(ui_.Select, {
-        value: currentTimeField,
-        options: timeFields,
-        onChange: (selectdbTimeFiled)=>{
-            setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
-                timeField: selectdbTimeFiled.value
-            }));
-            setLoc((prev)=>{
-                const searchParams = prev.searchParams;
-                searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('timeField', selectdbTimeFiled.value);
-                return discover_header_object_spread_props(discover_header_object_spread({}, prev), {
-                    searchParams
-                });
-            });
-        },
-        placeholder: 'Time Field'
-    })), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: "Time Range",
-        style: {
-            marginLeft: 8,
-            marginRight: 8
-        }
-    }, /*#__PURE__*/ external_react_default().createElement(ui_.TimeRangeInput, {
-        isReversed: false,
-        onChange: (timeRange)=>{
-            const start = dayjs_min_default()(timeRange.from.toDate());
-            const end = dayjs_min_default()(timeRange.to.toDate());
-            setLoc((prev)=>{
-                const searchParams = prev.searchParams;
-                searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('startTime', start.format(constants/* FORMAT_DATE */.fU));
-                searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('endTime', end.format(constants/* FORMAT_DATE */.fU));
-                return discover_header_object_spread_props(discover_header_object_spread({}, prev), {
-                    searchParams
-                });
-            });
-            setCurrentDate([
-                start,
-                end
-            ]);
-            setTimeRange(timeRange);
-        },
-        value: timeRange
-    }))), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: ""
-    }, /*#__PURE__*/ external_react_default().createElement(ui_.Button, {
-        onClick: ()=>{
-            const latestTime = (0,utils_data/* getLatestTime */.hC)(activeItem === null || activeItem === void 0 ? void 0 : activeItem.key);
-            if (latestTime) {
-                const [latestStartTime, latestEndTime] = latestTime;
-                setLoc((prev)=>{
-                    const searchParams = prev.searchParams;
-                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('startTime', dayjs_min_default()(latestStartTime).format(constants/* FORMAT_DATE */.fU));
-                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('endTime', dayjs_min_default()(latestEndTime).format(constants/* FORMAT_DATE */.fU));
-                    return discover_header_object_spread_props(discover_header_object_spread({}, prev), {
-                        searchParams
-                    });
-                });
-            }
-            props === null || props === void 0 ? void 0 : props.onQuerying();
-        },
-        variant: "primary",
-        className: "h-8",
-        icon: (props === null || props === void 0 ? void 0 : props.loading) ? 'fa fa-spinner' : 'sync',
-        disabled: !currentTimeField
-    }, `Query`)));
-}
-
-// EXTERNAL MODULE: ./components/testIds.ts
-var testIds = __webpack_require__(5611);
-// EXTERNAL MODULE: ./services/traces.ts + 1 modules
-var traces = __webpack_require__(3764);
-// EXTERNAL MODULE: ../node_modules/antd/es/message/index.js + 38 modules
-var message = __webpack_require__(4749);
 // EXTERNAL MODULE: ../node_modules/@hyperdx/lucene/lib/lucene.js
 var lucene = __webpack_require__(9894);
 ;// ./utils/query-parser/tokenUtils.ts
@@ -5353,6 +4533,7 @@ var JSDataType = /*#__PURE__*/ function(JSDataType) {
     JSDataType["Tuple"] = "tuple";
     JSDataType["Bool"] = "bool";
     JSDataType["JSON"] = "json";
+    JSDataType["Variant"] = "variant";
     JSDataType["Dynamic"] = "dynamic";
     return JSDataType;
 }({});
@@ -5374,6 +4555,8 @@ const convertCHDataTypeToJSType = (dataType)=>{
         return "bool";
     } else if (dataType.startsWith('JSON')) {
         return "json";
+    } else if (dataType.toLowerCase().startsWith('variant')) {
+        return "variant";
     } else if (dataType.startsWith('Dynamic')) {
         return "dynamic";
     } else if (dataType.startsWith('LowCardinality')) {
@@ -5576,7 +4759,7 @@ class SQLSerializer {
     }
     eq(field, term, isNegatedField) {
         return serializers_async_to_generator(function*() {
-            const { column, columnJSON, found, propertyType, supportsTextSearch, sourceColumn } = yield this.getColumnForField(field);
+            const { column, columnJSON, found, propertyType, supportsTextSearch, sourceColumn, variantRoot } = yield this.getColumnForField(field);
             if (!found) {
                 return this.NOT_FOUND_QUERY;
             }
@@ -5594,6 +4777,8 @@ class SQLSerializer {
                 return sqlstring_browser.format(`(${columnJSON === null || columnJSON === void 0 ? void 0 : columnJSON.string} ${isNegatedField ? '!' : ''}= ?)`, [
                     term
                 ]);
+            } else if (propertyType === JSDataType.Variant) {
+                return this.variantEquality(column, term, isNegatedField, supportsTextSearch, sourceColumn, Boolean(variantRoot));
             } else if (propertyType === JSDataType.String && supportsTextSearch) {
                 const searchTarget = column && column.length > 0 ? column : sourceColumn;
                 if (!searchTarget) {
@@ -5618,12 +4803,15 @@ class SQLSerializer {
             if (propertyType === JSDataType.JSON) {
                 return `notEmpty(${columnJSON === null || columnJSON === void 0 ? void 0 : columnJSON.string}) ${isNegatedField ? '!' : ''}= 1`;
             }
+            if (propertyType === JSDataType.Variant) {
+                return `notEmpty(toString(${column})) ${isNegatedField ? '!' : ''}= 1`;
+            }
             return `notEmpty(${column}) ${isNegatedField ? '!' : ''}= 1`;
         }).call(this);
     }
     gte(field, term) {
         return serializers_async_to_generator(function*() {
-            const { column, columnJSON, found, propertyType } = yield this.getColumnForField(field);
+            const { column, columnJSON, found, propertyType, variantRoot } = yield this.getColumnForField(field);
             if (!found) {
                 return this.NOT_FOUND_QUERY;
             }
@@ -5632,6 +4820,9 @@ class SQLSerializer {
                     term
                 ]);
             }
+            if (propertyType === JSDataType.Variant) {
+                return this.variantNumericComparison(column, '>=', term, Boolean(variantRoot));
+            }
             return sqlstring_browser.format(`(${column} >= ?)`, [
                 term
             ]);
@@ -5639,7 +4830,7 @@ class SQLSerializer {
     }
     lte(field, term) {
         return serializers_async_to_generator(function*() {
-            const { column, columnJSON, found, propertyType } = yield this.getColumnForField(field);
+            const { column, columnJSON, found, propertyType, variantRoot } = yield this.getColumnForField(field);
             if (!found) {
                 return this.NOT_FOUND_QUERY;
             }
@@ -5648,6 +4839,9 @@ class SQLSerializer {
                     term
                 ]);
             }
+            if (propertyType === JSDataType.Variant) {
+                return this.variantNumericComparison(column, '<=', term, Boolean(variantRoot));
+            }
             return sqlstring_browser.format(`(${column} <= ?)`, [
                 term
             ]);
@@ -5655,7 +4849,7 @@ class SQLSerializer {
     }
     lt(field, term) {
         return serializers_async_to_generator(function*() {
-            const { column, columnJSON, found, propertyType } = yield this.getColumnForField(field);
+            const { column, columnJSON, found, propertyType, variantRoot } = yield this.getColumnForField(field);
             if (!found) {
                 return this.NOT_FOUND_QUERY;
             }
@@ -5664,6 +4858,9 @@ class SQLSerializer {
                     term
                 ]);
             }
+            if (propertyType === JSDataType.Variant) {
+                return this.variantNumericComparison(column, '<', term, Boolean(variantRoot));
+            }
             return sqlstring_browser.format(`(${column} < ?)`, [
                 term
             ]);
@@ -5671,7 +4868,7 @@ class SQLSerializer {
     }
     gt(field, term) {
         return serializers_async_to_generator(function*() {
-            const { column, columnJSON, found, propertyType } = yield this.getColumnForField(field);
+            const { column, columnJSON, found, propertyType, variantRoot } = yield this.getColumnForField(field);
             if (!found) {
                 return this.NOT_FOUND_QUERY;
             }
@@ -5679,6 +4876,9 @@ class SQLSerializer {
                 return sqlstring_browser.format(`(${columnJSON === null || columnJSON === void 0 ? void 0 : columnJSON.number} > ?)`, [
                     term
                 ]);
+            }
+            if (propertyType === JSDataType.Variant) {
+                return this.variantNumericComparison(column, '>', term, Boolean(variantRoot));
             }
             return sqlstring_browser.format(`(${column} > ?)`, [
                 term
@@ -5698,10 +4898,74 @@ class SQLSerializer {
     termHasSeperators(term) {
         return term.match(/[ -/:-@[-`{-~\t\n\r]+/) != null;
     }
+    isNumericTerm(term) {
+        return /^[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?$/.test(`${term}`.trim());
+    }
+    isBooleanTerm(term) {
+        return /^(true|false)$/i.test(`${term}`.trim());
+    }
+    wrapNegation(clause, isNegated) {
+        return isNegated ? `(NOT ${clause})` : clause;
+    }
+    variantNumericComparison(column, operator, term, variantRoot) {
+        if (!column || variantRoot || !this.isNumericTerm(term)) {
+            return this.NOT_FOUND_QUERY;
+        }
+        return sqlstring_browser.format(`(dynamicType(?) in (?) AND CAST(toString(?) AS DOUBLE) ${operator} CAST(? AS DOUBLE))`, [
+            sqlstring_browser.raw(column),
+            CLICK_HOUSE_JSON_NUMBER_TYPES,
+            sqlstring_browser.raw(column),
+            term
+        ]);
+    }
+    variantBooleanComparison(column, term, isNegatedField) {
+        if (!column || !this.isBooleanTerm(term)) {
+            return this.NOT_FOUND_QUERY;
+        }
+        const clause = sqlstring_browser.format(`(lower(toString(?)) = ?)`, [
+            sqlstring_browser.raw(column),
+            `${term}`.trim().toLowerCase()
+        ]);
+        return this.wrapNegation(clause, isNegatedField);
+    }
+    variantLikePattern(term, prefixWildcard, suffixWildcard, isPhrase) {
+        if (prefixWildcard || suffixWildcard) {
+            return `${prefixWildcard ? '%' : ''}${term}${suffixWildcard ? '%' : ''}`;
+        }
+        return isPhrase ? `%${term}%` : `%${term}%`;
+    }
+    variantTextSearch(column, term, isNegatedField, prefixWildcard, suffixWildcard, isPhrase, supportsTextSearch, sourceColumn, variantRoot = false) {
+        if (!column) {
+            return this.NOT_FOUND_QUERY;
+        }
+        if (variantRoot && supportsTextSearch && sourceColumn) {
+            const usePhrasePrefix = !isPhrase && suffixWildcard && !prefixWildcard;
+            const matchTerm = isPhrase ? term : usePhrasePrefix ? term : `${prefixWildcard ? '*' : ''}${term}${suffixWildcard ? '*' : ''}`;
+            const operator = isPhrase ? 'MATCH_PHRASE' : usePhrasePrefix ? 'MATCH_PHRASE_PREFIX' : 'MATCH_ANY';
+            return sqlstring_browser.format(`(? ${isNegatedField ? 'NOT ' : ''}${operator} ?)`, [
+                sqlstring_browser.raw(sourceColumn),
+                matchTerm
+            ]);
+        }
+        return sqlstring_browser.format(`(lower(toString(?)) ${isNegatedField ? 'NOT ' : ''}LIKE lower(?))`, [
+            sqlstring_browser.raw(column),
+            this.variantLikePattern(term, prefixWildcard, suffixWildcard, isPhrase)
+        ]);
+    }
+    variantEquality(column, term, isNegatedField, supportsTextSearch, sourceColumn, variantRoot = false) {
+        if (this.isBooleanTerm(term)) {
+            return this.variantBooleanComparison(column, term, isNegatedField);
+        }
+        if (this.isNumericTerm(term)) {
+            const clause = this.variantNumericComparison(column, '=', term, variantRoot);
+            return clause === this.NOT_FOUND_QUERY ? clause : this.wrapNegation(clause, isNegatedField);
+        }
+        return this.variantTextSearch(column, term, isNegatedField, false, false, true, supportsTextSearch, sourceColumn, variantRoot);
+    }
     fieldSearch(field, term, isNegatedField, prefixWildcard, suffixWildcard, isPhrase) {
         return serializers_async_to_generator(function*() {
             const isImplicitField = field === IMPLICIT_FIELD;
-            const { column, found, propertyType, supportsTextSearch, sourceColumn, implicitTargets } = yield this.getColumnForField(field);
+            const { column, found, propertyType, supportsTextSearch, sourceColumn, implicitTargets, variantRoot } = yield this.getColumnForField(field);
             if (!found) {
                 return this.NOT_FOUND_QUERY;
             }
@@ -5716,6 +4980,15 @@ class SQLSerializer {
                     column,
                     term
                 ]);
+            } else if (propertyType === JSDataType.Variant) {
+                if (this.isBooleanTerm(term)) {
+                    return this.variantBooleanComparison(column, term, isNegatedField);
+                }
+                if (this.isNumericTerm(term)) {
+                    const clause = this.variantNumericComparison(column, '=', term, Boolean(variantRoot));
+                    return clause === this.NOT_FOUND_QUERY ? clause : this.wrapNegation(clause, isNegatedField);
+                }
+                return this.variantTextSearch(column, term, isNegatedField, prefixWildcard, suffixWildcard, isPhrase, supportsTextSearch, sourceColumn, Boolean(variantRoot));
             } else if (propertyType === JSDataType.JSON && supportsTextSearch === false) {
                 return this.NOT_FOUND_QUERY;
             }
@@ -5730,10 +5003,10 @@ class SQLSerializer {
                         if (!target) {
                             return null;
                         }
-                        if (isPhrase && target.propertyType !== JSDataType.String && target.propertyType !== JSDataType.JSON) {
+                        if (isPhrase && target.propertyType !== JSDataType.String && target.propertyType !== JSDataType.JSON && target.propertyType !== JSDataType.Variant) {
                             return null;
                         }
-                        if ((target.propertyType === JSDataType.String || target.propertyType === JSDataType.JSON) && target.supportsTextSearch) {
+                        if ((target.propertyType === JSDataType.String || target.propertyType === JSDataType.JSON || target.propertyType === JSDataType.Variant) && target.supportsTextSearch) {
                             var _target_sourceColumn;
                             const identifier = (_target_sourceColumn = target.sourceColumn) !== null && _target_sourceColumn !== void 0 ? _target_sourceColumn : target.column;
                             if (!identifier) {
@@ -5743,6 +5016,17 @@ class SQLSerializer {
                             return sqlstring_browser.format(`(?? ${operator} ?)`, [
                                 identifier,
                                 matchTerm
+                            ]);
+                        }
+                        if (target.propertyType === JSDataType.Variant) {
+                            var _target_column;
+                            const identifier = (_target_column = target.column) !== null && _target_column !== void 0 ? _target_column : target.sourceColumn;
+                            if (!identifier) {
+                                return null;
+                            }
+                            return sqlstring_browser.format(`(lower(toString(?)) LIKE lower(?))`, [
+                                sqlstring_browser.raw(identifier),
+                                this.variantLikePattern(term, prefixWildcard, suffixWildcard, isPhrase)
                             ]);
                         }
                         if (target.propertyType === JSDataType.Number) {
@@ -5829,9 +5113,17 @@ class SQLSerializer {
     }
     range(field, start, end, isNegatedField) {
         return serializers_async_to_generator(function*() {
-            const { column, found } = yield this.getColumnForField(field);
+            const { column, found, propertyType, variantRoot } = yield this.getColumnForField(field);
             if (!found) {
                 return this.NOT_FOUND_QUERY;
+            }
+            if (propertyType === JSDataType.Variant) {
+                const startClause = this.variantNumericComparison(column, '>=', start, Boolean(variantRoot));
+                const endClause = this.variantNumericComparison(column, '<=', end, Boolean(variantRoot));
+                if (startClause === this.NOT_FOUND_QUERY || endClause === this.NOT_FOUND_QUERY) {
+                    return this.NOT_FOUND_QUERY;
+                }
+                return this.wrapNegation(`(${startClause} AND ${endClause})`, isNegatedField);
             }
             return sqlstring_browser.format(`(${column} ${isNegatedField ? 'NOT ' : ''}BETWEEN ? AND ?)`, [
                 this.attemptToParseNumber(start),
@@ -5927,15 +5219,22 @@ class CustomSchemaSQLSerializerV2 extends SQLSerializer {
             return indexes.has(column.toLowerCase());
         }).call(this);
     }
+    isVariantColumnType(columnType) {
+        return columnType.toLowerCase().startsWith('variant');
+    }
     buildColumnExpressionFromField(field) {
         return serializers_async_to_generator(function*() {
             const exactMatch = yield this.fetchColumnMetadata(field);
             if (exactMatch) {
+                const isVariantRoot = this.isVariantColumnType(exactMatch.type);
                 return {
                     found: true,
                     columnType: exactMatch.type,
-                    columnExpression: exactMatch.name,
-                    sourceColumn: exactMatch.name
+                    columnExpression: isVariantRoot ? sqlstring_browser.format(`??`, [
+                        exactMatch.name
+                    ]) : exactMatch.name,
+                    sourceColumn: exactMatch.name,
+                    variantRoot: isVariantRoot
                 };
             }
             const fieldPrefix = field.split('.')[0];
@@ -5971,6 +5270,18 @@ class CustomSchemaSQLSerializerV2 extends SQLSerializer {
                         columnType: 'JSON',
                         sourceColumn: prefixMatch.name
                     };
+                } else if (this.isVariantColumnType(prefixMatch.type)) {
+                    const nestedPaths = fieldPostfix.split('.').filter(Boolean);
+                    return {
+                        found: true,
+                        columnExpression: sqlstring_browser.format(`??${Array(nestedPaths.length).fill('[?]').join('')}`, [
+                            prefixMatch.name,
+                            ...nestedPaths
+                        ]),
+                        columnType: 'Variant',
+                        sourceColumn: prefixMatch.name,
+                        variantRoot: nestedPaths.length === 0
+                    };
                 } else if (prefixMatch.type === 'String') {
                     const nestedPaths = fieldPostfix.split('.');
                     return {
@@ -5989,7 +5300,8 @@ class CustomSchemaSQLSerializerV2 extends SQLSerializer {
                 found: true,
                 columnExpression: field,
                 columnType: 'Unknown',
-                sourceColumn: field
+                sourceColumn: field,
+                variantRoot: false
             };
         }).call(this);
     }
@@ -6011,9 +5323,9 @@ class CustomSchemaSQLSerializerV2 extends SQLSerializer {
                             const candidateExpression = yield this.buildColumnExpressionFromField(candidate);
                             const candidatePropertyType = (_convertCHTypeToPrimitiveJSType = convertCHTypeToPrimitiveJSType(candidateExpression.columnType)) !== null && _convertCHTypeToPrimitiveJSType !== void 0 ? _convertCHTypeToPrimitiveJSType : undefined;
                             let candidateSupportsTextSearch;
-                            if ((candidatePropertyType === JSDataType.String || candidatePropertyType === JSDataType.JSON) && candidateExpression.sourceColumn && candidateExpression.columnExpression === candidateExpression.sourceColumn) {
+                            if ((candidatePropertyType === JSDataType.String || candidatePropertyType === JSDataType.JSON || candidatePropertyType === JSDataType.Variant) && candidateExpression.sourceColumn && (candidateExpression.columnExpression === candidateExpression.sourceColumn || candidateExpression.variantRoot)) {
                                 candidateSupportsTextSearch = yield this.columnHasInvertedIndex(candidateExpression.sourceColumn);
-                            } else if (candidatePropertyType === JSDataType.String || candidatePropertyType === JSDataType.JSON) {
+                            } else if (candidatePropertyType === JSDataType.String || candidatePropertyType === JSDataType.JSON || candidatePropertyType === JSDataType.Variant) {
                                 candidateSupportsTextSearch = false;
                             }
                             return {
@@ -6039,9 +5351,9 @@ class CustomSchemaSQLSerializerV2 extends SQLSerializer {
             const expression = yield this.buildColumnExpressionFromField(field);
             const propertyType = (_convertCHTypeToPrimitiveJSType = convertCHTypeToPrimitiveJSType(expression.columnType)) !== null && _convertCHTypeToPrimitiveJSType !== void 0 ? _convertCHTypeToPrimitiveJSType : undefined;
             let supportsTextSearch;
-            if ((propertyType === JSDataType.String || propertyType === JSDataType.JSON) && expression.sourceColumn && expression.columnExpression === expression.sourceColumn) {
+            if ((propertyType === JSDataType.String || propertyType === JSDataType.JSON || propertyType === JSDataType.Variant) && expression.sourceColumn && (expression.columnExpression === expression.sourceColumn || expression.variantRoot)) {
                 supportsTextSearch = yield this.columnHasInvertedIndex(expression.sourceColumn);
-            } else if (propertyType === JSDataType.String || propertyType === JSDataType.JSON) {
+            } else if (propertyType === JSDataType.String || propertyType === JSDataType.JSON || propertyType === JSDataType.Variant) {
                 supportsTextSearch = false;
             }
             return {
@@ -6051,6 +5363,7 @@ class CustomSchemaSQLSerializerV2 extends SQLSerializer {
                 supportsTextSearch,
                 sourceColumn: expression.sourceColumn,
                 implicitTargets: undefined,
+                variantRoot: expression.variantRoot,
                 found: expression.found
             };
         }).call(this);
@@ -6225,6 +5538,1250 @@ function genEnglishExplanation(query) {
     })();
 }
 
+;// ./utils/query-parser/lucene-index-warning.ts
+
+
+function normalizeName(name) {
+    return String(name !== null && name !== void 0 ? name : '').trim().toLowerCase();
+}
+function normalizeLuceneField(field) {
+    const normalized = String(field !== null && field !== void 0 ? field : '').trim();
+    return normalized[0] === '-' ? normalized.slice(1) : normalized;
+}
+function isNodeTerm(ast) {
+    return ast.term != null;
+}
+function isNodeRangedTerm(ast) {
+    return ast.inclusive != null;
+}
+function isBinaryAST(ast) {
+    return ast.right != null;
+}
+function isLeftOnlyAST(ast) {
+    return ast.left != null;
+}
+function isTextSearchTerm(node) {
+    var _node_term;
+    const term = String((_node_term = node.term) !== null && _node_term !== void 0 ? _node_term : '').trim();
+    if (!term || term === '*') {
+        return false;
+    }
+    if (!node.quoted && /^(>=|<=|>|<)/.test(term)) {
+        return false;
+    }
+    return true;
+}
+function collectTextSearchFields(ast, fields) {
+    if (isNodeTerm(ast)) {
+        const field = normalizeLuceneField(ast.field);
+        if (field && field !== IMPLICIT_FIELD && isTextSearchTerm(ast)) {
+            fields.add(field);
+        }
+        return;
+    }
+    if (isNodeRangedTerm(ast)) {
+        return;
+    }
+    if (isBinaryAST(ast)) {
+        collectTextSearchFields(ast.left, fields);
+        collectTextSearchFields(ast.right, fields);
+        return;
+    }
+    if (isLeftOnlyAST(ast)) {
+        collectTextSearchFields(ast.left, fields);
+    }
+}
+function hasInvertedIndex(field, indexes) {
+    const normalizedField = normalizeName(field);
+    return indexes.some((index)=>{
+        var _ref, _ref1, _ref2, _ref3;
+        const indexType = String((_ref = index === null || index === void 0 ? void 0 : index.type) !== null && _ref !== void 0 ? _ref : '').toUpperCase();
+        if (!indexType.includes('INVERT')) {
+            return false;
+        }
+        const indexedColumn = normalizeName((_ref1 = (_ref2 = (_ref3 = index === null || index === void 0 ? void 0 : index.columnName) !== null && _ref3 !== void 0 ? _ref3 : index === null || index === void 0 ? void 0 : index.Field) !== null && _ref2 !== void 0 ? _ref2 : index === null || index === void 0 ? void 0 : index.field) !== null && _ref1 !== void 0 ? _ref1 : index === null || index === void 0 ? void 0 : index.value);
+        return indexedColumn === normalizedField;
+    });
+}
+function findFieldMetadata(field, tableFields) {
+    const normalizedField = normalizeName(field);
+    const directMatch = tableFields.find((item)=>{
+        var _ref, _ref1;
+        return normalizeName((_ref = (_ref1 = item === null || item === void 0 ? void 0 : item.Field) !== null && _ref1 !== void 0 ? _ref1 : item === null || item === void 0 ? void 0 : item.field) !== null && _ref !== void 0 ? _ref : item === null || item === void 0 ? void 0 : item.value) === normalizedField;
+    });
+    if (directMatch) {
+        return directMatch;
+    }
+    const fieldPrefix = normalizeName(field.split('.')[0]);
+    return tableFields.find((item)=>{
+        var _ref, _ref1;
+        return normalizeName((_ref = (_ref1 = item === null || item === void 0 ? void 0 : item.Field) !== null && _ref1 !== void 0 ? _ref1 : item === null || item === void 0 ? void 0 : item.field) !== null && _ref !== void 0 ? _ref : item === null || item === void 0 ? void 0 : item.value) === fieldPrefix;
+    });
+}
+function getPrimitiveFieldType(columnType) {
+    if (!columnType) {
+        return '';
+    }
+    const normalizedType = columnType.toUpperCase();
+    if ([
+        'INT',
+        'LARGEINT',
+        'SMALLINT',
+        'TINYINT',
+        'DECIMAL',
+        'BIGINT',
+        'FLOAT',
+        'DOUBLE'
+    ].some((type)=>normalizedType.includes(type))) {
+        return 'NUMBER';
+    }
+    if ([
+        'DATE',
+        'DATETIME',
+        'DATEV2',
+        'DATETIMEV2'
+    ].some((type)=>normalizedType.includes(type))) {
+        return 'DATE';
+    }
+    if (normalizedType.includes('BOOLEAN')) {
+        return 'BOOLEAN';
+    }
+    if ([
+        'VARCHAR',
+        'STRING',
+        'CHAR',
+        'TEXT',
+        'JSONB',
+        'ARRAY',
+        'VARIANT'
+    ].some((type)=>normalizedType.includes(type))) {
+        return 'TEXT';
+    }
+    return '';
+}
+function shouldWarnForField(field, tableFields) {
+    var _metadata_Type;
+    const metadata = findFieldMetadata(field, tableFields);
+    if (!metadata) {
+        return true;
+    }
+    const fieldType = getPrimitiveFieldType((_metadata_Type = metadata.Type) !== null && _metadata_Type !== void 0 ? _metadata_Type : metadata.type);
+    return fieldType !== 'NUMBER' && fieldType !== 'DATE' && fieldType !== 'BOOLEAN';
+}
+function getLuceneFieldsWithoutInvertedIndex(query, indexes, tableFields) {
+    const trimmedQuery = query === null || query === void 0 ? void 0 : query.trim();
+    if (!trimmedQuery || !indexes.length && !tableFields.length) {
+        return [];
+    }
+    try {
+        const ast = parse(trimmedQuery);
+        const fields = new Set();
+        collectTextSearchFields(ast, fields);
+        return Array.from(fields).filter((field)=>shouldWarnForField(field, tableFields) && !hasInvertedIndex(field, indexes));
+    } catch (error) {
+        return [];
+    }
+}
+
+;// ./components/discover-header/lucene.tsx
+
+
+
+
+
+
+
+function Lucene({ onQuerying }) {
+    const [searchValue, setSearchValue] = (0,react/* useAtom */.fp)(discover/* searchValueAtom */.P8);
+    const indexes = (0,react/* useAtomValue */.md)(discover/* indexesAtom */.Eq);
+    const tableFields = (0,react/* useAtomValue */.md)(discover/* tableFieldsAtom */.D_);
+    const theme = (0,ui_.useTheme2)();
+    const fieldsWithoutInvertedIndex = external_react_default().useMemo(()=>getLuceneFieldsWithoutInvertedIndex(searchValue, indexes, tableFields), [
+        searchValue,
+        indexes,
+        tableFields
+    ]);
+    const warningFields = fieldsWithoutInvertedIndex.slice(0, 3).join(', ');
+    const remainingWarningFieldCount = fieldsWithoutInvertedIndex.length - 3;
+    if (false) // removed by dead control flow
+{}
+    return /*#__PURE__*/ external_react_default().createElement("div", {
+        style: {
+            width: '100%'
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.Input, {
+        value: searchValue,
+        onChange: (e)=>{
+            var _e_target;
+            setSearchValue((_e_target = e.target) === null || _e_target === void 0 ? void 0 : _e_target.value);
+        },
+        onKeyDown: (e)=>{
+            const native = e.nativeEvent;
+            if (e.key === 'Enter' && !(native && native.isComposing)) {
+                try {
+                    onQuerying === null || onQuerying === void 0 ? void 0 : onQuerying();
+                } catch (err) {
+                    (0,runtime_.logError)((0,errors/* toError */.i)(err), {
+                        source: 'Lucene',
+                        action: 'onQuerying'
+                    });
+                }
+            }
+        },
+        placeholder: "usage: field:value AND field2:value2"
+    }), fieldsWithoutInvertedIndex.length > 0 ? /*#__PURE__*/ external_react_default().createElement("div", {
+        style: {
+            alignItems: 'center',
+            color: theme.colors.warning.text,
+            display: 'flex',
+            fontSize: theme.typography.bodySmall.fontSize,
+            gap: theme.spacing(0.5),
+            lineHeight: theme.typography.bodySmall.lineHeight,
+            marginTop: theme.spacing(0.5)
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.Icon, {
+        name: "exclamation-triangle",
+        size: "sm"
+    }), /*#__PURE__*/ external_react_default().createElement("span", null, warningFields, remainingWarningFieldCount > 0 ? ` 等 ${fieldsWithoutInvertedIndex.length} 个字段` : '', ' ', "未配置倒排索引，Lucene 查询可能较慢。")) : null);
+}
+
+// EXTERNAL MODULE: ./hooks/useDatasourcePermissions.ts
+var useDatasourcePermissions = __webpack_require__(9693);
+// EXTERNAL MODULE: ./utils/time.ts
+var utils_time = __webpack_require__(1157);
+;// ./components/discover-header/application-filter.ts
+const APPLICATION_FILTER_ID = 'application-filter';
+function getConfiguredApplicationAttributeKey(value) {
+    return (value === null || value === void 0 ? void 0 : value.trim()) || '';
+}
+function getCommittedApplication(filters, attributeKey) {
+    const filter = filters.find((item)=>item.id === APPLICATION_FILTER_ID);
+    if ((filter === null || filter === void 0 ? void 0 : filter.variantKey) !== attributeKey || filter.value[0] == null) {
+        return '';
+    }
+    return String(filter.value[0]);
+}
+function applyApplicationFilter(filters, application, attributeKey) {
+    const current = filters.find((filter)=>filter.id === APPLICATION_FILTER_ID);
+    const isCurrent = application ? (current === null || current === void 0 ? void 0 : current.fieldName) === 'resource_attributes' && current.variantKey === attributeKey && current.operator === '=' && current.value.length === 1 && String(current.value[0]) === application : !current;
+    if (isCurrent) {
+        return {
+            changed: false,
+            filters
+        };
+    }
+    const remaining = filters.filter((filter)=>filter.id !== APPLICATION_FILTER_ID);
+    if (!application) {
+        return {
+            changed: true,
+            filters: remaining
+        };
+    }
+    return {
+        changed: true,
+        filters: [
+            ...remaining,
+            {
+                id: APPLICATION_FILTER_ID,
+                fieldName: 'resource_attributes',
+                variantKey: attributeKey,
+                operator: '=',
+                value: [
+                    application
+                ],
+                label: `Application: ${application}`
+            }
+        ]
+    };
+}
+
+;// ./components/discover-header/index.tsx
+'use client';
+function discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function discover_header_async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+function discover_header_define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function discover_header_object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            discover_header_define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function discover_header_ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function discover_header_object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        discover_header_ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getStoredValue(key) {
+    if (typeof window === 'undefined') {
+        return undefined;
+    }
+    try {
+        const raw = window.localStorage.getItem(key);
+        if (!raw) {
+            return undefined;
+        }
+        return JSON.parse(raw);
+    } catch (unused) {
+        return undefined;
+    }
+}
+function resolveDatasourceUid(dataSource, datasources = (0,runtime_.getDataSourceSrv)().getList()) {
+    if (!dataSource) {
+        return '';
+    }
+    if (typeof dataSource === 'string') {
+        const matched = datasources.find((ds)=>ds.uid === dataSource || ds.name === dataSource);
+        return (matched === null || matched === void 0 ? void 0 : matched.uid) || dataSource;
+    }
+    if (typeof dataSource === 'object') {
+        if (dataSource.uid) {
+            return dataSource.uid;
+        }
+        if (dataSource.name) {
+            const matched = datasources.find((ds)=>ds.name === dataSource.name);
+            return (matched === null || matched === void 0 ? void 0 : matched.uid) || '';
+        }
+    }
+    return '';
+}
+function normalizeMode(mode) {
+    if (!mode) {
+        return undefined;
+    }
+    const normalizedMode = mode.trim().toLowerCase();
+    if (normalizedMode === 'sql') {
+        return 'SQL';
+    }
+    if (normalizedMode === 'search') {
+        return 'Search';
+    }
+    if (normalizedMode === 'lucene') {
+        return 'Lucene';
+    }
+    return undefined;
+}
+function resolveDatasourceFromParam(datasourceParam, datasources = (0,runtime_.getDataSourceSrv)().getList()) {
+    if (!datasourceParam) {
+        return undefined;
+    }
+    const normalizedDatasource = datasourceParam.trim();
+    if (!normalizedDatasource) {
+        return undefined;
+    }
+    return datasources.find((ds)=>ds.uid === normalizedDatasource || ds.name === normalizedDatasource);
+}
+function normalizeRawTimeValue(value) {
+    if (typeof value !== 'string') {
+        return undefined;
+    }
+    const normalizedValue = value.trim();
+    return normalizedValue || undefined;
+}
+function isRelativeRawRange(raw) {
+    const from = normalizeRawTimeValue(raw === null || raw === void 0 ? void 0 : raw.from);
+    const to = normalizeRawTimeValue(raw === null || raw === void 0 ? void 0 : raw.to);
+    return Boolean((from === null || from === void 0 ? void 0 : from.startsWith('now')) && (to === null || to === void 0 ? void 0 : to.startsWith('now')));
+}
+function findShortcutByRaw(rawFrom, rawTo) {
+    if (!rawFrom || !rawTo) {
+        return undefined;
+    }
+    return utils_data/* DISCOVER_SHORTCUTS */.oU.find((shortcut)=>shortcut.raw.from === rawFrom && shortcut.raw.to === rawTo);
+}
+function DiscoverHeader(props) {
+    var _ref;
+    var _loc_searchParams;
+    const { loading, onQuerying } = props;
+    // const catalog = 'internal';
+    // const catalogs = useAtomValue(catalogAtom);
+    const setIndexes = (0,react/* useSetAtom */.Xr)(discover/* indexesAtom */.Eq);
+    const [searchType, setSearchType] = (0,react/* useAtom */.fp)(discover/* searchTypeAtom */.WM);
+    const [discoverCurrent, setDiscoverCurrent] = (0,react/* useAtom */.fp)(discover/* discoverCurrentAtom */.WN);
+    if (false) // removed by dead control flow
+{}
+    const [loc, setLoc] = (0,react/* useAtom */.fp)(discover/* locationAtom */.JT);
+    // const [currentCluster, setCurrentCluster] = useAtom(currentClusterAtom);
+    const [tableFields, setTableFields] = (0,react/* useAtom */.fp)(discover/* tableFieldsAtom */.D_);
+    const [timeFields, setTimeFields] = (0,react/* useAtom */.fp)(discover/* timeFieldsAtom */.Gg);
+    const [_currentDate, setCurrentDate] = (0,react/* useAtom */.fp)(discover/* currentDateAtom */.Zb);
+    const currentTimeField = (0,react/* useAtomValue */.md)(discover/* currentTimeFieldAtom */.CA);
+    const [, setCurrentIndex] = (0,react/* useAtom */.fp)(discover/* currentIndexAtom */.TY);
+    const searchFocus = (0,react/* useAtomValue */.md)(discover/* searchFocusAtom */.MM);
+    // const { databaseList } = useDatabaseList();
+    const [activeItem, setActiveItem] = (0,react/* useAtom */.fp)(discover/* activeShortcutAtom */.m_);
+    // const [clusters, setClusters] = useState<any[]>([]);
+    // const database = loc.searchParams?.get('database');
+    // const table = loc.searchParams?.get('table');
+    // const cluster = loc.searchParams?.get('cluster');
+    // const startTime = loc.searchParams?.get('startTime');
+    // const endTime = loc.searchParams?.get('endTime');
+    const [selectedDatasource, setSelectedDatasource] = (0,react/* useAtom */.fp)(discover/* selectedDatasourceAtom */.SW);
+    const [timeRange, setTimeRange] = (0,react/* useAtom */.fp)(discover/* timeRangeAtom */.U9);
+    const [currentTable, setCurrentTable] = (0,react/* useAtom */.fp)(discover/* currentTableAtom */.$w);
+    const [databases, setDatabases] = (0,react/* useAtom */.fp)(discover/* databasesAtom */.SK);
+    const [tables, setTables] = (0,react/* useAtom */.fp)(discover/* tablesAtom */.b9);
+    const [_datasources] = (0,react/* useAtom */.fp)(discover/* datasourcesAtom */.ui);
+    const [searchValue, setSearchValue] = (0,react/* useAtom */.fp)(discover/* searchValueAtom */.P8);
+    const [timeZone, setTimeZone] = (0,react/* useAtom */.fp)(discover/* timeZoneAtom */.tF);
+    const [dataFilter, setDataFilter] = (0,react/* useAtom */.fp)(discover/* dataFilterAtom */.EA);
+    const [applicationDraft, setApplicationDraft] = external_react_default().useState('');
+    const [applicationOptions, setApplicationOptions] = external_react_default().useState([]);
+    const [applicationOptionsLoading, setApplicationOptionsLoading] = external_react_default().useState(false);
+    const [resolvedFieldsContext, setResolvedFieldsContext] = external_react_default().useState('');
+    const searchMode = searchType === 'Search';
+    const selectdbDS = (0,react/* useAtomValue */.md)(discover/* selectedDatasourceAtom */.SW);
+    const theme = (0,ui_.useTheme2)();
+    const context = (0,data_.usePluginContext)();
+    const jsonData = context.meta.jsonData || {};
+    const configuredLogsConfig = jsonData.logsConfig;
+    const logsConfig = (0,plugin_settings/* mergeLogsConfig */.oW)(configuredLogsConfig);
+    const applicationAttributeKey = getConfiguredApplicationAttributeKey(configuredLogsConfig === null || configuredLogsConfig === void 0 ? void 0 : configuredLogsConfig.applicationAttributeKey);
+    const isApplicationFilterConfigured = Boolean(applicationAttributeKey);
+    const { allowedDatasources, allowedDatasourceUids, loading: datasourcePermissionsLoading, error: datasourcePermissionsError } = (0,useDatasourcePermissions/* useDatasourcePermissions */.R)(jsonData.teamDatasourcePermissions, 'DiscoverHeader');
+    const hasInitializedUrlSyncRef = external_react_default().useRef(false);
+    const locSearch = (_ref = loc === null || loc === void 0 ? void 0 : (_loc_searchParams = loc.searchParams) === null || _loc_searchParams === void 0 ? void 0 : _loc_searchParams.toString()) !== null && _ref !== void 0 ? _ref : '';
+    const fieldsContext = `${(selectdbDS === null || selectdbDS === void 0 ? void 0 : selectdbDS.uid) || ''}\u0000${discoverCurrent.database}\u0000${currentTable}`;
+    const hasResourceAttributes = isApplicationFilterConfigured && resolvedFieldsContext === fieldsContext && tableFields.some((field)=>(field === null || field === void 0 ? void 0 : field.Field) === 'resource_attributes');
+    const committedApplication = getCommittedApplication(dataFilter, applicationAttributeKey);
+    const applicationStartDate = _currentDate[0] ? (0,utils_time/* formatTimeInZone */.Oh)(_currentDate[0], timeZone) : '';
+    const applicationEndDate = _currentDate[1] ? (0,utils_time/* formatTimeInZone */.Oh)(_currentDate[1], timeZone) : '';
+    const visibleApplicationOptions = external_react_default().useMemo(()=>{
+        if (!applicationDraft || applicationOptions.some((option)=>option.value === applicationDraft)) {
+            return applicationOptions;
+        }
+        return [
+            {
+                label: applicationDraft,
+                value: applicationDraft
+            },
+            ...applicationOptions
+        ];
+    }, [
+        applicationDraft,
+        applicationOptions
+    ]);
+    const resetApplicationFilter = external_react_default().useCallback(()=>{
+        setApplicationDraft('');
+        setDataFilter((current)=>{
+            const next = current.filter((filter)=>filter.id !== APPLICATION_FILTER_ID);
+            return next.length === current.length ? current : next;
+        });
+        setApplicationOptions([]);
+        setResolvedFieldsContext('');
+    }, [
+        setDataFilter
+    ]);
+    const commitApplicationAndQuery = external_react_default().useCallback(()=>{
+        const result = applyApplicationFilter(dataFilter, applicationDraft, applicationAttributeKey);
+        if (!result.changed) {
+            onQuerying();
+            return;
+        }
+        setDataFilter(result.filters);
+    }, [
+        applicationAttributeKey,
+        applicationDraft,
+        dataFilter,
+        onQuerying,
+        setDataFilter
+    ]);
+    const applyAbsoluteTimeRange = external_react_default().useCallback((start, end)=>{
+        setCurrentDate([
+            start,
+            end
+        ]);
+        setTimeRange((prev)=>discover_header_object_spread({}, prev, (0,utils_time/* buildAbsoluteTimeRange */.kh)(start, end)));
+    }, [
+        setCurrentDate,
+        setTimeRange
+    ]);
+    const updateShareParams = external_react_default().useCallback((updates)=>{
+        setLoc((prev)=>{
+            var _ref;
+            var _prev_searchParams;
+            const currentSearch = (_ref = prev === null || prev === void 0 ? void 0 : (_prev_searchParams = prev.searchParams) === null || _prev_searchParams === void 0 ? void 0 : _prev_searchParams.toString()) !== null && _ref !== void 0 ? _ref : '';
+            const searchParams = new URLSearchParams(currentSearch);
+            Object.entries(updates).forEach(([key, value])=>{
+                const normalizedValue = value === null || value === void 0 ? void 0 : value.trim();
+                if (normalizedValue) {
+                    searchParams.set(key, normalizedValue);
+                } else {
+                    searchParams.delete(key);
+                }
+            });
+            if (searchParams.toString() === currentSearch) {
+                return prev;
+            }
+            return discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                searchParams
+            });
+        });
+    }, [
+        setLoc
+    ]);
+    const fetchDatabases = external_react_default().useCallback((ds)=>{
+        if (!ds) {
+            return undefined;
+        }
+        return (0,metaservice/* getDatabases */.Hm)(ds).subscribe({
+            next: (resp)=>{
+                const { data, ok } = resp;
+                if (ok) {
+                    const frame = (0,data_.toDataFrame)(data.results.getDatabases.frames[0]);
+                    const values = Array.from(frame.fields[0].values);
+                    const options = values.map((item)=>({
+                            label: item,
+                            value: item
+                        }));
+                    setDatabases(options);
+                }
+            },
+            error: (err)=>(0,runtime_.logError)((0,errors/* toError */.i)(err), {
+                    source: 'DiscoverHeader',
+                    action: 'fetchDatabases'
+                })
+        });
+    }, [
+        setDatabases
+    ]);
+    (0,external_react_.useEffect)(()=>{
+        if (!selectdbDS) {
+            return;
+        }
+        const subscription = fetchDatabases(selectdbDS);
+        return ()=>subscription === null || subscription === void 0 ? void 0 : subscription.unsubscribe();
+    }, [
+        selectdbDS,
+        fetchDatabases
+    ]);
+    function getFields(selectedTable, initOptions) {
+        var _ref, _ref1;
+        const effectiveDatasource = (_ref = initOptions === null || initOptions === void 0 ? void 0 : initOptions.datasource) !== null && _ref !== void 0 ? _ref : selectdbDS;
+        const effectiveDatabase = (_ref1 = initOptions === null || initOptions === void 0 ? void 0 : initOptions.database) !== null && _ref1 !== void 0 ? _ref1 : discoverCurrent.database;
+        if (!effectiveDatasource || !effectiveDatabase || !(selectedTable === null || selectedTable === void 0 ? void 0 : selectedTable.value)) {
+            return;
+        }
+        setResolvedFieldsContext('');
+        (0,metaservice/* getFieldsService */.H1)({
+            selectdbDS: effectiveDatasource,
+            database: effectiveDatabase,
+            table: selectedTable.value
+        }).subscribe({
+            next: ({ data, ok })=>{
+                if (ok) {
+                    const frame = (0,data_.toDataFrame)(data.results.getFields.frames[0]);
+                    const values = Array.from(frame.fields[0].values);
+                    const fieldTypes = Array.from(frame.fields[1].values);
+                    const tableFields = values.map((item, index)=>{
+                        return {
+                            label: item,
+                            Field: item,
+                            value: item,
+                            Type: fieldTypes[index]
+                        };
+                    });
+                    setTableFields(tableFields);
+                    setResolvedFieldsContext(`${effectiveDatasource.uid || ''}\u0000${effectiveDatabase}\u0000${selectedTable.value}`);
+                    if (values) {
+                        var _ref, _ref1;
+                        var _options_, _initOptions_onResolved;
+                        const options = values.filter((field, index)=>{
+                            return (0,utils_data/* isValidTimeFieldType */.Q3)(fieldTypes[index].toUpperCase());
+                        }).map((item)=>{
+                            return {
+                                label: item,
+                                value: item
+                            };
+                        });
+                        const preferredTimeField = ((_ref = (_ref1 = initOptions === null || initOptions === void 0 ? void 0 : initOptions.preferredTimeField) !== null && _ref1 !== void 0 ? _ref1 : currentTimeField) !== null && _ref !== void 0 ? _ref : '').trim();
+                        const targetTimeField = options.some((option)=>option.value === preferredTimeField) ? preferredTimeField : ((_options_ = options[0]) === null || _options_ === void 0 ? void 0 : _options_.value) || '';
+                        setDiscoverCurrent((prev)=>discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                                database: effectiveDatabase,
+                                table: selectedTable.value,
+                                timeField: targetTimeField || prev.timeField
+                            }));
+                        setTimeFields(options);
+                        initOptions === null || initOptions === void 0 ? void 0 : (_initOptions_onResolved = initOptions.onResolved) === null || _initOptions_onResolved === void 0 ? void 0 : _initOptions_onResolved.call(initOptions, targetTimeField);
+                    }
+                }
+            },
+            error: (err)=>{
+                (0,runtime_.logError)((0,errors/* toError */.i)(err), {
+                    source: 'DiscoverHeader',
+                    action: 'getFields'
+                });
+            }
+        });
+    }
+    function getIndexes(selectedTable, initOptions) {
+        var _ref, _ref1;
+        const effectiveDatasource = (_ref = initOptions === null || initOptions === void 0 ? void 0 : initOptions.datasource) !== null && _ref !== void 0 ? _ref : selectdbDS;
+        const effectiveDatabase = (_ref1 = initOptions === null || initOptions === void 0 ? void 0 : initOptions.database) !== null && _ref1 !== void 0 ? _ref1 : discoverCurrent.database;
+        if (!effectiveDatasource || !effectiveDatabase || !(selectedTable === null || selectedTable === void 0 ? void 0 : selectedTable.value)) {
+            return;
+        }
+        (0,metaservice/* getIndexesService */.s1)({
+            selectdbDS: effectiveDatasource,
+            database: effectiveDatabase,
+            table: selectedTable.value
+        }).subscribe({
+            next: ({ data, ok })=>{
+                if (ok) {
+                    const frame = (0,data_.toDataFrame)(data.results.getIndexes.frames[0]);
+                    const values = Array.from(frame.fields[2].values);
+                    const columnNames = Array.from(frame.fields[4].values);
+                    const indexesTypes = Array.from(frame.fields[10].values);
+                    if (!values || values.length === 0) {
+                        setIndexes([]);
+                        setCurrentIndex([]);
+                        return;
+                    }
+                    const tableIndexes = values === null || values === void 0 ? void 0 : values.map((item, index)=>{
+                        return {
+                            label: item,
+                            value: item,
+                            type: indexesTypes[index],
+                            columnName: columnNames[index]
+                        };
+                    });
+                    setIndexes(tableIndexes);
+                    if (tableIndexes) {
+                        setCurrentIndex(tableIndexes);
+                    }
+                }
+            },
+            error: (err)=>{
+                (0,runtime_.logError)((0,errors/* toError */.i)(err), {
+                    source: 'DiscoverHeader',
+                    action: 'getIndexes'
+                });
+            }
+        });
+    }
+    function initHeaderData() {
+        return discover_header_async_to_generator(function*() {
+            var _ref, _urlSearchParams_get;
+            var _urlSearchParams_get1, _urlSearchParams_get2, _urlSearchParams_get3, _urlSearchParams_get4, _urlSearchParams_get5, _allowedDatasources_;
+            const urlSearchParams = new URLSearchParams(locSearch);
+            const persistedDatasourceStorage = getStoredValue('discover-selected-datasource');
+            const persistedDiscoverCurrentStorage = getStoredValue('discover-current');
+            const persistedTableStorage = getStoredValue('discover-current-table');
+            const urlDatasource = resolveDatasourceFromParam(urlSearchParams.get('datasource'), allowedDatasources);
+            const urlDatabase = ((_urlSearchParams_get1 = urlSearchParams.get('database')) === null || _urlSearchParams_get1 === void 0 ? void 0 : _urlSearchParams_get1.trim()) || '';
+            const urlTable = ((_urlSearchParams_get2 = urlSearchParams.get('table')) === null || _urlSearchParams_get2 === void 0 ? void 0 : _urlSearchParams_get2.trim()) || '';
+            const urlMode = normalizeMode(urlSearchParams.get('mode'));
+            const urlSearchValue = (_ref = (_urlSearchParams_get = urlSearchParams.get('query')) !== null && _urlSearchParams_get !== void 0 ? _urlSearchParams_get : urlSearchParams.get('searchValue')) !== null && _ref !== void 0 ? _ref : '';
+            const urlTimeZone = (0,utils_time/* normalizeTimeZone */.F9)(urlSearchParams.get('timeZone'));
+            const effectiveTimeZone = urlTimeZone || timeZone;
+            const urlTimeField = ((_urlSearchParams_get3 = urlSearchParams.get('timeField')) === null || _urlSearchParams_get3 === void 0 ? void 0 : _urlSearchParams_get3.trim()) || '';
+            const urlStartTime = (0,utils_time/* parseTimeInZone */.mk)(urlSearchParams.get('startTime'), effectiveTimeZone);
+            const urlEndTime = (0,utils_time/* parseTimeInZone */.mk)(urlSearchParams.get('endTime'), effectiveTimeZone);
+            const urlTimeRawFrom = ((_urlSearchParams_get4 = urlSearchParams.get('timeRawFrom')) === null || _urlSearchParams_get4 === void 0 ? void 0 : _urlSearchParams_get4.trim()) || '';
+            const urlTimeRawTo = ((_urlSearchParams_get5 = urlSearchParams.get('timeRawTo')) === null || _urlSearchParams_get5 === void 0 ? void 0 : _urlSearchParams_get5.trim()) || '';
+            const matchedShortcut = findShortcutByRaw(urlTimeRawFrom, urlTimeRawTo);
+            const configuredDatasourceUid = resolveDatasourceUid(logsConfig.datasource, allowedDatasources);
+            const persistedDatasourceUid = (urlDatasource === null || urlDatasource === void 0 ? void 0 : urlDatasource.uid) || (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) || (persistedDatasourceStorage === null || persistedDatasourceStorage === void 0 ? void 0 : persistedDatasourceStorage.uid);
+            const persistedDatabase = urlDatabase || discoverCurrent.database || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.database) || '';
+            const persistedTable = urlTable || currentTable || persistedTableStorage || discoverCurrent.table || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.table) || '';
+            const persistedTimeField = urlTimeField || discoverCurrent.timeField || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.timeField) || '';
+            const requestedDatasourceUid = persistedDatasourceUid || configuredDatasourceUid || '';
+            const defaultDatasourceUid = requestedDatasourceUid && allowedDatasourceUids.has(requestedDatasourceUid) ? requestedDatasourceUid : ((_allowedDatasources_ = allowedDatasources[0]) === null || _allowedDatasources_ === void 0 ? void 0 : _allowedDatasources_.uid) || '';
+            const defaultDatabase = persistedDatabase || logsConfig.database || '';
+            const defaultLogsTable = persistedTable || logsConfig.logsTable || '';
+            const hasRelativeTimeParams = Boolean(urlTimeRawFrom && urlTimeRawTo);
+            const hasAbsoluteTimeParams = Boolean(urlStartTime && urlEndTime);
+            if (urlTimeZone && urlTimeZone !== timeZone) {
+                setTimeZone(urlTimeZone);
+            }
+            if (hasRelativeTimeParams && urlTimeRawFrom && urlTimeRawTo) {
+                const relativeTimeRange = (0,utils_time/* buildRelativeTimeRange */.n)(urlTimeRawFrom, urlTimeRawTo, effectiveTimeZone);
+                setActiveItem(matchedShortcut);
+                setCurrentDate((0,utils_time/* toDayjsRange */.K$)(relativeTimeRange));
+                setTimeRange((prev)=>discover_header_object_spread({}, prev, relativeTimeRange));
+            } else if (hasRelativeTimeParams) {
+                setActiveItem(undefined);
+            } else if (hasAbsoluteTimeParams && urlStartTime && urlEndTime) {
+                setActiveItem(undefined);
+                applyAbsoluteTimeRange(urlStartTime, urlEndTime);
+            }
+            if (allowedDatasources.length === 0) {
+                setSelectedDatasource(undefined);
+                setDatabases([]);
+                setTables([]);
+                setCurrentTable('');
+                setDiscoverCurrent((prev)=>discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                        database: '',
+                        table: '',
+                        timeField: ''
+                    }));
+                if (urlMode) {
+                    setSearchType(urlMode);
+                }
+                setSearchValue(urlSearchValue);
+                hasInitializedUrlSyncRef.current = true;
+                return;
+            }
+            if (!defaultDatasourceUid || !defaultDatabase) {
+                if (urlMode) {
+                    setSearchType(urlMode);
+                }
+                if (urlTimeField) {
+                    setDiscoverCurrent((prev)=>discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                            timeField: urlTimeField
+                        }));
+                }
+                setSearchValue(urlSearchValue);
+                hasInitializedUrlSyncRef.current = true;
+                return;
+            }
+            try {
+                var _allowedDatasources_find;
+                if (urlMode) {
+                    setSearchType(urlMode);
+                }
+                if (urlTimeField) {
+                    setDiscoverCurrent((prev)=>discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                            timeField: urlTimeField
+                        }));
+                }
+                setSearchValue(urlSearchValue);
+                const ds = (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) === defaultDatasourceUid ? selectedDatasource : (_allowedDatasources_find = allowedDatasources.find((datasource)=>datasource.uid === defaultDatasourceUid)) !== null && _allowedDatasources_find !== void 0 ? _allowedDatasources_find : yield (0,runtime_.getDataSourceSrv)().get({
+                    uid: defaultDatasourceUid
+                });
+                if (!ds) {
+                    return;
+                }
+                if ((selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) !== defaultDatasourceUid) {
+                    setSelectedDatasource(ds);
+                }
+                fetchDatabases(ds);
+                (0,metaservice/* getTablesService */.Rw)({
+                    selectdbDS: ds,
+                    database: defaultDatabase
+                }).subscribe({
+                    next: (resp)=>{
+                        const { data, ok } = resp;
+                        if (ok) {
+                            var _options_find, _options_;
+                            const frame = (0,data_.toDataFrame)(data.results.getTables.frames[0]);
+                            const values = Array.from(frame.fields[0].values);
+                            const options = values.map((item)=>({
+                                    label: item,
+                                    value: item
+                                }));
+                            const targetTable = ((_options_find = options.find((option)=>option.value === defaultLogsTable)) === null || _options_find === void 0 ? void 0 : _options_find.value) || ((_options_ = options[0]) === null || _options_ === void 0 ? void 0 : _options_.value) || '';
+                            setTables(options);
+                            setCurrentTable(targetTable);
+                            setDiscoverCurrent((prev)=>discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                                    database: defaultDatabase,
+                                    table: targetTable
+                                }));
+                            if (targetTable) {
+                                getFields({
+                                    value: targetTable
+                                }, {
+                                    datasource: ds,
+                                    database: defaultDatabase,
+                                    preferredTimeField: persistedTimeField
+                                });
+                                getIndexes({
+                                    value: targetTable
+                                }, {
+                                    datasource: ds,
+                                    database: defaultDatabase
+                                });
+                            }
+                        }
+                    },
+                    error: (err)=>(0,runtime_.logError)((0,errors/* toError */.i)(err), {
+                            source: 'DiscoverHeader',
+                            action: 'getTables'
+                        })
+                });
+            } catch (error) {
+                (0,runtime_.logError)((0,errors/* toError */.i)(error), {
+                    source: 'DiscoverHeader',
+                    action: 'initHeaderData'
+                });
+            } finally{
+                hasInitializedUrlSyncRef.current = true;
+            }
+        })();
+    }
+    (0,external_react_.useEffect)(()=>{
+        if (datasourcePermissionsLoading || hasInitializedUrlSyncRef.current) {
+            return;
+        }
+        void initHeaderData();
+    // We only want to apply plugin-config defaults once when the page mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        datasourcePermissionsLoading
+    ]);
+    (0,external_react_.useEffect)(()=>{
+        var _urlSearchParams_get, _urlSearchParams_get1, _urlSearchParams_get2, _urlSearchParams_get3, _timeRange_raw, _timeRange_raw1;
+        if (!hasInitializedUrlSyncRef.current) {
+            return;
+        }
+        const urlSearchParams = new URLSearchParams(locSearch);
+        const urlTimeRawFrom = ((_urlSearchParams_get = urlSearchParams.get('timeRawFrom')) === null || _urlSearchParams_get === void 0 ? void 0 : _urlSearchParams_get.trim()) || '';
+        const urlTimeRawTo = ((_urlSearchParams_get1 = urlSearchParams.get('timeRawTo')) === null || _urlSearchParams_get1 === void 0 ? void 0 : _urlSearchParams_get1.trim()) || '';
+        const urlStartTimeParam = ((_urlSearchParams_get2 = urlSearchParams.get('startTime')) === null || _urlSearchParams_get2 === void 0 ? void 0 : _urlSearchParams_get2.trim()) || '';
+        const urlEndTimeParam = ((_urlSearchParams_get3 = urlSearchParams.get('endTime')) === null || _urlSearchParams_get3 === void 0 ? void 0 : _urlSearchParams_get3.trim()) || '';
+        const urlTimeZone = (0,utils_time/* normalizeTimeZone */.F9)(urlSearchParams.get('timeZone')) || timeZone;
+        const urlStartTime = (0,utils_time/* parseTimeInZone */.mk)(urlStartTimeParam, urlTimeZone);
+        const urlEndTime = (0,utils_time/* parseTimeInZone */.mk)(urlEndTimeParam, urlTimeZone);
+        const rawFrom = normalizeRawTimeValue(timeRange === null || timeRange === void 0 ? void 0 : (_timeRange_raw = timeRange.raw) === null || _timeRange_raw === void 0 ? void 0 : _timeRange_raw.from);
+        const rawTo = normalizeRawTimeValue(timeRange === null || timeRange === void 0 ? void 0 : (_timeRange_raw1 = timeRange.raw) === null || _timeRange_raw1 === void 0 ? void 0 : _timeRange_raw1.to);
+        const shouldShareRelativeRaw = isRelativeRawRange(timeRange === null || timeRange === void 0 ? void 0 : timeRange.raw);
+        const currentStartTime = _currentDate[0] ? (0,utils_time/* formatTimeInZone */.Oh)(_currentDate[0], timeZone) : undefined;
+        const currentEndTime = _currentDate[1] ? (0,utils_time/* formatTimeInZone */.Oh)(_currentDate[1], timeZone) : undefined;
+        const hasRelativeTimeParams = Boolean(urlTimeRawFrom && urlTimeRawTo);
+        const hasAbsoluteTimeParams = Boolean(urlStartTime && urlEndTime);
+        const isRelativeTimeSynced = hasRelativeTimeParams && rawFrom === urlTimeRawFrom && rawTo === urlTimeRawTo;
+        const isAbsoluteTimeSynced = hasAbsoluteTimeParams && !shouldShareRelativeRaw && currentStartTime === urlStartTimeParam && currentEndTime === urlEndTimeParam;
+        if ((hasRelativeTimeParams || hasAbsoluteTimeParams) && !isRelativeTimeSynced && !isAbsoluteTimeSynced) {
+            return;
+        }
+        updateShareParams({
+            datasource: (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) || (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.name) || '',
+            database: discoverCurrent.database,
+            table: currentTable || discoverCurrent.table,
+            mode: searchType,
+            query: searchValue,
+            timeField: currentTimeField,
+            timeZone,
+            startTime: shouldShareRelativeRaw ? undefined : currentStartTime,
+            endTime: shouldShareRelativeRaw ? undefined : currentEndTime,
+            timeRawFrom: shouldShareRelativeRaw ? rawFrom : undefined,
+            timeRawTo: shouldShareRelativeRaw ? rawTo : undefined
+        });
+    }, [
+        currentTable,
+        currentTimeField,
+        _currentDate,
+        discoverCurrent.database,
+        discoverCurrent.table,
+        locSearch,
+        searchType,
+        searchValue,
+        selectedDatasource,
+        timeRange === null || timeRange === void 0 ? void 0 : timeRange.raw,
+        timeZone,
+        updateShareParams
+    ]);
+    (0,external_react_.useEffect)(()=>{
+        setApplicationDraft(committedApplication);
+    }, [
+        committedApplication
+    ]);
+    (0,external_react_.useEffect)(()=>{
+        if (!hasResourceAttributes || !selectdbDS || !discoverCurrent.database || !currentTable || !currentTimeField || !applicationStartDate || !applicationEndDate) {
+            setApplicationOptions([]);
+            setApplicationOptionsLoading(false);
+            return;
+        }
+        setApplicationOptionsLoading(true);
+        const subscription = (0,metaservice/* getApplicationValuesService */.UD)({
+            selectdbDS,
+            database: discoverCurrent.database,
+            table: currentTable,
+            timeField: currentTimeField,
+            startDate: applicationStartDate,
+            endDate: applicationEndDate,
+            attributeKey: applicationAttributeKey
+        }).subscribe({
+            next: ({ data, ok })=>{
+                var _data_results_getApplicationValues_frames, _data_results_getApplicationValues, _data_results, _dataFrame_fields_;
+                setApplicationOptionsLoading(false);
+                if (!ok) {
+                    setApplicationOptions([]);
+                    return;
+                }
+                const frame = data === null || data === void 0 ? void 0 : (_data_results = data.results) === null || _data_results === void 0 ? void 0 : (_data_results_getApplicationValues = _data_results.getApplicationValues) === null || _data_results_getApplicationValues === void 0 ? void 0 : (_data_results_getApplicationValues_frames = _data_results_getApplicationValues.frames) === null || _data_results_getApplicationValues_frames === void 0 ? void 0 : _data_results_getApplicationValues_frames[0];
+                if (!frame) {
+                    setApplicationOptions([]);
+                    return;
+                }
+                const dataFrame = (0,data_.toDataFrame)(frame);
+                const values = Array.from(((_dataFrame_fields_ = dataFrame.fields[0]) === null || _dataFrame_fields_ === void 0 ? void 0 : _dataFrame_fields_.values) || []);
+                const uniqueValues = new Set();
+                values.forEach((value)=>{
+                    if (value != null && String(value).trim()) {
+                        uniqueValues.add(String(value));
+                    }
+                });
+                setApplicationOptions(Array.from(uniqueValues, (value)=>({
+                        label: value,
+                        value
+                    })));
+            },
+            error: (error)=>{
+                setApplicationOptionsLoading(false);
+                setApplicationOptions([]);
+                (0,runtime_.logError)((0,errors/* toError */.i)(error), {
+                    source: 'DiscoverHeader',
+                    action: 'getApplicationValues'
+                });
+            }
+        });
+        return ()=>subscription.unsubscribe();
+    }, [
+        applicationAttributeKey,
+        applicationEndDate,
+        applicationStartDate,
+        currentTable,
+        currentTimeField,
+        discoverCurrent.database,
+        hasResourceAttributes,
+        selectdbDS
+    ]);
+    return /*#__PURE__*/ external_react_default().createElement("div", {
+        className: (0,css_.css)`
+                padding: 1rem;
+                padding-top: 1.5rem;
+                background-color: ${theme.isDark ? 'rgb(24, 27, 31)' : '#FFF'};
+                display: flex;
+                border-radius: 0.25rem 0.25rem 0 0;
+            `
+    }, /*#__PURE__*/ external_react_default().createElement(DiscoverHeaderSearch, {
+        className: "h-8 rounded border border-solid border-n9 dark:border-n7"
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: "Datasource",
+        description: datasourcePermissionsError ? 'Failed to load team datasource permissions' : undefined
+    }, /*#__PURE__*/ external_react_default().createElement(runtime_.DataSourcePicker, {
+        width: 15,
+        type: 'mysql',
+        current: selectedDatasource,
+        placeholder: "Choose",
+        noDefault: true,
+        disabled: datasourcePermissionsLoading || allowedDatasources.length === 0,
+        isLoading: datasourcePermissionsLoading,
+        filter: (ds)=>ds.type === 'mysql' && allowedDatasourceUids.has(ds.uid),
+        onChange: (item)=>{
+            if (!allowedDatasourceUids.has(item.uid)) {
+                return;
+            }
+            resetApplicationFilter();
+            setSelectedDatasource(item);
+            // Always fetch databases even if the same datasource is selected
+            fetchDatabases(item);
+        }
+    })), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: "Database",
+        style: {
+            marginLeft: 8
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.Select, {
+        width: 15,
+        options: databases,
+        value: discoverCurrent.database,
+        onChange: (selectedDatabase)=>{
+            resetApplicationFilter();
+            setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
+                database: selectedDatabase.value
+            }));
+            (0,metaservice/* getTablesService */.Rw)({
+                selectdbDS,
+                database: selectedDatabase.value
+            }).subscribe({
+                next: (resp)=>{
+                    const { data, ok } = resp;
+                    if (ok) {
+                        const frame = (0,data_.toDataFrame)(data.results.getTables.frames[0]);
+                        const values = Array.from(frame.fields[0].values);
+                        const options = values.map((item)=>({
+                                label: item,
+                                value: item
+                            }));
+                        setTables(options);
+                    }
+                },
+                error: (err)=>(0,runtime_.logError)((0,errors/* toError */.i)(err), {
+                        source: 'DiscoverHeader',
+                        action: 'getTables'
+                    })
+            });
+        }
+    })), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: "Table",
+        style: {
+            marginLeft: 8
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.Select, {
+        options: tables,
+        width: 15,
+        value: currentTable,
+        onChange: (selectedTable)=>{
+            resetApplicationFilter();
+            setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
+                table: selectedTable.value
+            }));
+            setCurrentTable(selectedTable.value);
+            getFields(selectedTable);
+            getIndexes(selectedTable);
+        }
+    })), isApplicationFilterConfigured ? /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: "Application",
+        style: {
+            marginLeft: 8
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.Select, {
+        options: visibleApplicationOptions,
+        width: 14,
+        value: applicationDraft || undefined,
+        placeholder: hasResourceAttributes ? 'All' : 'Unavailable',
+        isClearable: true,
+        isLoading: applicationOptionsLoading,
+        disabled: !hasResourceAttributes,
+        onChange: (selectedApplication)=>{
+            setApplicationDraft((selectedApplication === null || selectedApplication === void 0 ? void 0 : selectedApplication.value) || '');
+        }
+    })) : null, /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: "Mode",
+        style: {
+            marginLeft: 8,
+            marginRight: 8,
+            width: '120px'
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(SearchType, null)), searchType === 'Lucene' ? /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: "Lucene",
+        style: {
+            width: '100%'
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(Lucene, {
+        onQuerying: commitApplicationAndQuery
+    })) : /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: searchMode ? 'Search' : 'SQL',
+        style: {
+            width: '100%'
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(SQLSearch, {
+        style: {
+            flex: '1'
+        },
+        onQuerying: commitApplicationAndQuery
+    }))), !searchFocus && /*#__PURE__*/ external_react_default().createElement((external_react_default()).Fragment, null, /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: "Time Field"
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.Select, {
+        value: currentTimeField,
+        options: timeFields,
+        onChange: (selectdbTimeFiled)=>{
+            setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
+                timeField: selectdbTimeFiled.value
+            }));
+            setLoc((prev)=>{
+                var _ref;
+                var _prev_searchParams;
+                const searchParams = new URLSearchParams((_ref = prev === null || prev === void 0 ? void 0 : (_prev_searchParams = prev.searchParams) === null || _prev_searchParams === void 0 ? void 0 : _prev_searchParams.toString()) !== null && _ref !== void 0 ? _ref : '');
+                searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('timeField', selectdbTimeFiled.value);
+                return discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                    searchParams
+                });
+            });
+        },
+        placeholder: 'Time Field'
+    })), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: "Time Range",
+        style: {
+            marginLeft: 8,
+            marginRight: 8
+        }
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.TimeRangeInput, {
+        isReversed: false,
+        onChange: (timeRange)=>{
+            var _timeRange_raw, _timeRange_raw1;
+            const [start, end] = (0,utils_time/* toDayjsRange */.K$)(timeRange);
+            setActiveItem(undefined);
+            const rawFrom = normalizeRawTimeValue((_timeRange_raw = timeRange.raw) === null || _timeRange_raw === void 0 ? void 0 : _timeRange_raw.from);
+            const rawTo = normalizeRawTimeValue((_timeRange_raw1 = timeRange.raw) === null || _timeRange_raw1 === void 0 ? void 0 : _timeRange_raw1.to);
+            const hasRelativeRaw = isRelativeRawRange(timeRange.raw);
+            setLoc((prev)=>{
+                var _ref;
+                var _prev_searchParams;
+                const searchParams = new URLSearchParams((_ref = prev === null || prev === void 0 ? void 0 : (_prev_searchParams = prev.searchParams) === null || _prev_searchParams === void 0 ? void 0 : _prev_searchParams.toString()) !== null && _ref !== void 0 ? _ref : '');
+                if (hasRelativeRaw && rawFrom && rawTo) {
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.delete('startTime');
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.delete('endTime');
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('timeRawFrom', rawFrom);
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('timeRawTo', rawTo);
+                } else {
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('startTime', (0,utils_time/* formatTimeInZone */.Oh)(start, timeZone));
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('endTime', (0,utils_time/* formatTimeInZone */.Oh)(end, timeZone));
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.delete('timeRawFrom');
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.delete('timeRawTo');
+                }
+                searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('timeZone', timeZone);
+                return discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                    searchParams
+                });
+            });
+            setCurrentDate([
+                start,
+                end
+            ]);
+            setTimeRange({
+                from: (0,data_.dateTime)(timeRange.from.toDate()),
+                to: (0,data_.dateTime)(timeRange.to.toDate()),
+                raw: hasRelativeRaw && rawFrom && rawTo ? {
+                    from: rawFrom,
+                    to: rawTo
+                } : {
+                    from: (0,data_.dateTime)(timeRange.from.toDate()),
+                    to: (0,data_.dateTime)(timeRange.to.toDate())
+                }
+            });
+        },
+        onChangeTimeZone: (nextTimeZone)=>{
+            setTimeZone(nextTimeZone);
+            updateShareParams({
+                timeZone: nextTimeZone
+            });
+        },
+        timeZone: timeZone,
+        value: timeRange
+    }))), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
+        label: ""
+    }, /*#__PURE__*/ external_react_default().createElement(ui_.Button, {
+        onClick: ()=>{
+            const latestTime = (0,utils_data/* getLatestTime */.hC)(activeItem === null || activeItem === void 0 ? void 0 : activeItem.key);
+            if (latestTime) {
+                var _currentShortcut_raw, _currentShortcut_raw1;
+                const [latestStartTime, latestEndTime] = latestTime;
+                const currentShortcut = utils_data/* DISCOVER_SHORTCUTS */.oU.find((shortcut)=>shortcut.key === (activeItem === null || activeItem === void 0 ? void 0 : activeItem.key));
+                const rawFrom = normalizeRawTimeValue(currentShortcut === null || currentShortcut === void 0 ? void 0 : (_currentShortcut_raw = currentShortcut.raw) === null || _currentShortcut_raw === void 0 ? void 0 : _currentShortcut_raw.from);
+                const rawTo = normalizeRawTimeValue(currentShortcut === null || currentShortcut === void 0 ? void 0 : (_currentShortcut_raw1 = currentShortcut.raw) === null || _currentShortcut_raw1 === void 0 ? void 0 : _currentShortcut_raw1.to);
+                setLoc((prev)=>{
+                    var _ref;
+                    var _prev_searchParams;
+                    const searchParams = new URLSearchParams((_ref = prev === null || prev === void 0 ? void 0 : (_prev_searchParams = prev.searchParams) === null || _prev_searchParams === void 0 ? void 0 : _prev_searchParams.toString()) !== null && _ref !== void 0 ? _ref : '');
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.delete('startTime');
+                    searchParams === null || searchParams === void 0 ? void 0 : searchParams.delete('endTime');
+                    if (rawFrom && rawTo) {
+                        searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('timeRawFrom', rawFrom);
+                        searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('timeRawTo', rawTo);
+                    } else {
+                        searchParams === null || searchParams === void 0 ? void 0 : searchParams.delete('timeRawFrom');
+                        searchParams === null || searchParams === void 0 ? void 0 : searchParams.delete('timeRawTo');
+                    }
+                    return discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                        searchParams
+                    });
+                });
+                setCurrentDate([
+                    dayjs_min_default()(latestStartTime),
+                    dayjs_min_default()(latestEndTime)
+                ]);
+                setTimeRange((prev)=>discover_header_object_spread_props(discover_header_object_spread({}, prev), {
+                        from: (0,data_.dateTime)(dayjs_min_default()(latestStartTime).toDate()),
+                        to: (0,data_.dateTime)(dayjs_min_default()(latestEndTime).toDate()),
+                        raw: rawFrom && rawTo ? {
+                            from: rawFrom,
+                            to: rawTo
+                        } : (0,utils_time/* buildAbsoluteTimeRange */.kh)(dayjs_min_default()(latestStartTime), dayjs_min_default()(latestEndTime)).raw
+                    }));
+            }
+            commitApplicationAndQuery();
+        },
+        variant: "primary",
+        className: "h-8",
+        icon: loading ? 'fa fa-spinner' : 'sync',
+        disabled: !currentTimeField
+    }, `Query`)));
+}
+
+// EXTERNAL MODULE: ./components/testIds.ts
+var testIds = __webpack_require__(5611);
+// EXTERNAL MODULE: ./services/traces.ts + 1 modules
+var traces = __webpack_require__(3764);
+// EXTERNAL MODULE: ../node_modules/antd/es/message/index.js + 38 modules
+var message = __webpack_require__(4749);
 ;// ./utils/query-parser/query-parser.ts
 /* unused harmony import specifier */ var query_parser_parse;
 /* unused harmony import specifier */ var query_parser_genWhereSQL;
@@ -6558,6 +7115,7 @@ function useDiscoverData_object_spread_props(target, source) {
 
 
 
+
 function useDiscoverData() {
     const didRunPageEffect = (0,external_react_.useRef)(false);
     const didRunAutoRefreshEffect = (0,external_react_.useRef)(false);
@@ -6578,12 +7136,17 @@ function useDiscoverData() {
     const currentCatalog = (0,react/* useAtomValue */.md)(discover/* currentCatalogAtom */.K0);
     const currentDatabase = (0,react/* useAtomValue */.md)(discover/* currentDatabaseAtom */.Cf);
     const currentDate = (0,react/* useAtomValue */.md)(discover/* currentDateAtom */.Zb);
+    const timeZone = (0,react/* useAtomValue */.md)(discover/* timeZoneAtom */.tF);
     const setTableTotalCount = (0,react/* useSetAtom */.Xr)(discover/* tableTotalCountAtom */.HC);
     const setTraceData = (0,react/* useSetAtom */.Xr)(discover/* tableTracesDataAtom */.UB);
     const [loading, setLoading] = (0,react/* useAtom */.fp)(discover/* discoverLoadingAtom */.jU);
     const buildLuceneWhereClause = useLuceneWhereClause();
+    const formatCurrentTime = (0,external_react_.useCallback)((time)=>{
+        return time ? (0,utils_time/* formatTimeInZone */.Oh)(time, timeZone) : undefined;
+    }, [
+        timeZone
+    ]);
     const getTableData = (0,external_react_.useCallback)(()=>useDiscoverData_async_to_generator(function*() {
-            var _currentDate_;
             if (!currentTable || !currentDatabase || !selectdbDS) {
                 return;
             }
@@ -6596,8 +7159,10 @@ function useDiscoverData() {
                 database: currentDatabase,
                 table: currentTable,
                 timeField: currentTimeField,
-                startDate: (_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU),
-                endDate: currentDate[1].format(constants/* FORMAT_DATE */.fU),
+                startDate: formatCurrentTime(currentDate[0]),
+                endDate: formatCurrentTime(currentDate[1]),
+                startEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[0]),
+                endEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[1]),
                 cluster: '',
                 sort: 'DESC',
                 search_type: searchType,
@@ -6648,7 +7213,7 @@ function useDiscoverData() {
                             setTableData([]);
                             return;
                         }
-                        const rowsData = (0,utils_data/* convertColumnToRow */.HL)(frames[0]);
+                        const rowsData = (0,utils_data/* convertColumnToRowViaFieldsType */.ml)(frames[0], tableFields);
                         const resData = (0,utils_data/* generateHighlightedResults */.F9)({
                             search_value: searchValue,
                             indexes: currentIndexes || []
@@ -6682,12 +7247,12 @@ function useDiscoverData() {
         searchType,
         searchValue,
         selectdbDS,
+        formatCurrentTime,
         setLoading,
         setTableData,
         tableFields
     ]);
     const getTableDataCharts = (0,external_react_.useCallback)(()=>useDiscoverData_async_to_generator(function*() {
-            var _currentDate_;
             if (!currentTable || !currentDatabase || !selectdbDS) {
                 return;
             }
@@ -6703,8 +7268,10 @@ function useDiscoverData() {
                 database: currentDatabase,
                 table: currentTable,
                 timeField: currentTimeField,
-                startDate: (_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU),
-                endDate: currentDate[1].format(constants/* FORMAT_DATE */.fU),
+                startDate: formatCurrentTime(currentDate[0]),
+                endDate: formatCurrentTime(currentDate[1]),
+                startEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[0]),
+                endEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[1]),
                 cluster: '',
                 data_filters: [],
                 sort: 'DESC',
@@ -6788,12 +7355,12 @@ function useDiscoverData() {
         searchType,
         searchValue,
         selectdbDS,
+        formatCurrentTime,
         setLoading,
         setTableDataCharts,
         tableFields
     ]);
     const getTopData = (0,external_react_.useCallback)(()=>useDiscoverData_async_to_generator(function*() {
-            var _currentDate_;
             if (!currentTable || !currentDatabase || !selectdbDS) {
                 return;
             }
@@ -6803,8 +7370,10 @@ function useDiscoverData() {
                 database: currentDatabase,
                 table: currentTable,
                 timeField: currentTimeField,
-                startDate: (_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU),
-                endDate: currentDate[1].format(constants/* FORMAT_DATE */.fU),
+                startDate: formatCurrentTime(currentDate[0]),
+                endDate: formatCurrentTime(currentDate[1]),
+                startEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[0]),
+                endEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[1]),
                 cluster: '',
                 sort: 'DESC',
                 search_type: searchType,
@@ -6871,11 +7440,11 @@ function useDiscoverData() {
         searchType,
         searchValue,
         selectdbDS,
+        formatCurrentTime,
         setTopData,
         tableFields
     ]);
     const getTableDataCount = (0,external_react_.useCallback)(()=>useDiscoverData_async_to_generator(function*() {
-            var _currentDate_;
             if (!currentTable || !currentDatabase || !selectdbDS) {
                 return;
             }
@@ -6888,8 +7457,10 @@ function useDiscoverData() {
                 database: currentDatabase,
                 table: currentTable,
                 timeField: currentTimeField,
-                startDate: (_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU),
-                endDate: currentDate[1].format(constants/* FORMAT_DATE */.fU),
+                startDate: formatCurrentTime(currentDate[0]),
+                endDate: formatCurrentTime(currentDate[1]),
+                startEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[0]),
+                endEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[1]),
                 cluster: '',
                 sort: 'DESC',
                 interval: timeInterval,
@@ -6961,20 +7532,22 @@ function useDiscoverData() {
         searchType,
         searchValue,
         selectdbDS,
+        formatCurrentTime,
         setLoading,
         setTableTotalCount,
         tableFields
     ]);
     const getTraceData = (0,external_react_.useCallback)((trace_id, table, callback)=>{
-        var _currentDate_;
         const indexesStatement = (0,utils_data/* getIndexesStatement */.cE)(currentIndexes, tableFields, searchValue);
         const payload = {
             catalog: currentCatalog,
             database: currentDatabase,
             table: table || currentTable || 'otel_traces',
             timeField: currentTimeField,
-            startDate: (_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU),
-            endDate: currentDate[1].format(constants/* FORMAT_DATE */.fU),
+            startDate: formatCurrentTime(currentDate[0]),
+            endDate: formatCurrentTime(currentDate[1]),
+            startEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[0]),
+            endEpoch: (0,utils_time/* toEpochSeconds */.mL)(currentDate[1]),
             cluster: '',
             sort: 'DESC',
             search_type: searchType,
@@ -7027,6 +7600,7 @@ function useDiscoverData() {
         searchType,
         searchValue,
         selectdbDS,
+        formatCurrentTime,
         setTraceData,
         tableFields
     ]);
@@ -7188,4 +7762,4 @@ function PageDiscover() {
 /***/ }
 
 }]);
-//# sourceMappingURL=285.js.map?_cache=78aad12c01b5e573affd
+//# sourceMappingURL=58.js.map?_cache=e4dc5090cefc7c1f3307

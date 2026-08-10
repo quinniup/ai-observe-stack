@@ -1,7 +1,7 @@
 "use strict";
-(self["webpackChunkvelodb_doris_app"] = self["webpackChunkvelodb_doris_app"] || []).push([[600],{
+(self["webpackChunkvelodb_doris_app"] = self["webpackChunkvelodb_doris_app"] || []).push([[260],{
 
-/***/ 2600
+/***/ 8260
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 // ESM COMPAT FLAG
@@ -411,8 +411,8 @@ const TraceItem = ({ trace, onClick })=>{
 
 // EXTERNAL MODULE: ../node_modules/echarts-for-react/esm/index.js + 557 modules
 var esm = __webpack_require__(1244);
-// EXTERNAL MODULE: ./components/trace-detail/index.tsx
-var trace_detail = __webpack_require__(1885);
+// EXTERNAL MODULE: ./components/trace-detail/index.tsx + 1 modules
+var trace_detail = __webpack_require__(879);
 ;// ./components/traces/traces-viewer/index.tsx
 
 
@@ -574,7 +574,7 @@ const TraceView = /*#__PURE__*/ external_react_default().memo(({ traces: propTra
         onChange: (option)=>{
             setPage(1);
             setSort(option.value);
-            onSortByChange(option.value);
+            onSortByChange === null || onSortByChange === void 0 ? void 0 : onSortByChange(option.value);
         }
     }))), /*#__PURE__*/ external_react_default().createElement("div", {
         className: (0,css_.css)`
@@ -685,6 +685,8 @@ var constants = __webpack_require__(2351);
 var metaservice = __webpack_require__(8161);
 // EXTERNAL MODULE: ./utils/errors.ts
 var errors = __webpack_require__(9071);
+// EXTERNAL MODULE: ./hooks/useDatasourcePermissions.ts
+var useDatasourcePermissions = __webpack_require__(9693);
 ;// ./components/traces/traces-header/index.tsx
 'use client';
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
@@ -783,6 +785,7 @@ function _object_spread_props(target, source) {
 
 
 
+
 function getStoredValue(key) {
     if (typeof window === 'undefined') {
         return undefined;
@@ -797,12 +800,12 @@ function getStoredValue(key) {
         return undefined;
     }
 }
-function resolveDatasourceUid(dataSource) {
+function resolveDatasourceUid(dataSource, datasources = (0,runtime_.getDataSourceSrv)().getList()) {
     if (!dataSource) {
         return '';
     }
     if (typeof dataSource === 'string') {
-        const matched = (0,runtime_.getDataSourceSrv)().getList().find((ds)=>ds.uid === dataSource || ds.name === dataSource);
+        const matched = datasources.find((ds)=>ds.uid === dataSource || ds.name === dataSource);
         return (matched === null || matched === void 0 ? void 0 : matched.uid) || dataSource;
     }
     if (typeof dataSource === 'object') {
@@ -810,19 +813,74 @@ function resolveDatasourceUid(dataSource) {
             return dataSource.uid;
         }
         if (dataSource.name) {
-            const matched = (0,runtime_.getDataSourceSrv)().getList().find((ds)=>ds.name === dataSource.name);
+            const matched = datasources.find((ds)=>ds.name === dataSource.name);
             return (matched === null || matched === void 0 ? void 0 : matched.uid) || '';
         }
     }
     return '';
 }
+function resolveDatasourceFromParam(datasourceParam, datasources = (0,runtime_.getDataSourceSrv)().getList()) {
+    if (!datasourceParam) {
+        return undefined;
+    }
+    const normalizedDatasource = datasourceParam.trim();
+    if (!normalizedDatasource) {
+        return undefined;
+    }
+    return datasources.find((ds)=>ds.uid === normalizedDatasource || ds.name === normalizedDatasource);
+}
+function parseUrlDate(value) {
+    if (!value) {
+        return undefined;
+    }
+    const parsedDate = dayjs_min_default()(value);
+    return parsedDate.isValid() ? parsedDate : undefined;
+}
+function buildAbsoluteTimeRange(start, end) {
+    return {
+        from: (0,data_.dateTime)(start.toDate()),
+        to: (0,data_.dateTime)(end.toDate()),
+        raw: {
+            from: (0,data_.dateTime)(start.toDate()),
+            to: (0,data_.dateTime)(end.toDate())
+        }
+    };
+}
+function buildRelativeTimeRange(rawFrom, rawTo) {
+    const relativeRange = data_.rangeUtil.convertRawToRange({
+        from: rawFrom,
+        to: rawTo
+    });
+    return {
+        from: relativeRange.from,
+        to: relativeRange.to,
+        raw: {
+            from: rawFrom,
+            to: rawTo
+        }
+    };
+}
+function normalizeRawTimeValue(value) {
+    if (typeof value !== 'string') {
+        return undefined;
+    }
+    const normalizedValue = value.trim();
+    return normalizedValue || undefined;
+}
+function isRelativeRawRange(raw) {
+    const from = normalizeRawTimeValue(raw === null || raw === void 0 ? void 0 : raw.from);
+    const to = normalizeRawTimeValue(raw === null || raw === void 0 ? void 0 : raw.to);
+    return Boolean((from === null || from === void 0 ? void 0 : from.startsWith('now')) && (to === null || to === void 0 ? void 0 : to.startsWith('now')));
+}
 function TracesHeader() {
+    var _ref;
+    var _loc_searchParams;
     // const catalogs = useAtomValue(catalogAtom);
     const setIndexes = (0,react/* useSetAtom */.Xr)(discover/* indexesAtom */.Eq);
     const [discoverCurrent, setDiscoverCurrent] = (0,react/* useAtom */.fp)(discover/* discoverCurrentAtom */.WN);
     if (false) // removed by dead control flow
 {}
-    const setLoc = (0,react/* useSetAtom */.Xr)(discover/* locationAtom */.JT);
+    const [loc, setLoc] = (0,react/* useAtom */.fp)(discover/* locationAtom */.JT);
     const setTableFields = (0,react/* useSetAtom */.Xr)(discover/* tableFieldsAtom */.D_);
     const [timeFields, setTimeFields] = (0,react/* useAtom */.fp)(discover/* timeFieldsAtom */.Gg);
     const [_currentDate, setCurrentDate] = (0,react/* useAtom */.fp)(discover/* currentDateAtom */.Zb);
@@ -839,7 +897,34 @@ function TracesHeader() {
     const selectdbDS = (0,react/* useAtomValue */.md)(discover/* selectedDatasourceAtom */.SW);
     const context = (0,data_.usePluginContext)();
     const jsonData = context.meta.jsonData || {};
-    const logsConfig = (0,plugin_settings/* mergeLogsConfig */.o)(jsonData.logsConfig);
+    const logsConfig = (0,plugin_settings/* mergeLogsConfig */.oW)(jsonData.logsConfig);
+    const { allowedDatasources, allowedDatasourceUids, loading: datasourcePermissionsLoading, error: datasourcePermissionsError } = (0,useDatasourcePermissions/* useDatasourcePermissions */.R)(jsonData.teamDatasourcePermissions, 'TracesHeader');
+    const hasInitializedUrlSyncRef = external_react_default().useRef(false);
+    const locSearch = (_ref = loc === null || loc === void 0 ? void 0 : (_loc_searchParams = loc.searchParams) === null || _loc_searchParams === void 0 ? void 0 : _loc_searchParams.toString()) !== null && _ref !== void 0 ? _ref : '';
+    const updateShareParams = external_react_default().useCallback((updates)=>{
+        setLoc((prev)=>{
+            var _ref;
+            var _prev_searchParams;
+            const currentSearch = (_ref = prev === null || prev === void 0 ? void 0 : (_prev_searchParams = prev.searchParams) === null || _prev_searchParams === void 0 ? void 0 : _prev_searchParams.toString()) !== null && _ref !== void 0 ? _ref : '';
+            const searchParams = new URLSearchParams(currentSearch);
+            Object.entries(updates).forEach(([key, value])=>{
+                const normalizedValue = value === null || value === void 0 ? void 0 : value.trim();
+                if (normalizedValue) {
+                    searchParams.set(key, normalizedValue);
+                } else {
+                    searchParams.delete(key);
+                }
+            });
+            if (searchParams.toString() === currentSearch) {
+                return prev;
+            }
+            return _object_spread_props(_object_spread({}, prev), {
+                searchParams
+            });
+        });
+    }, [
+        setLoc
+    ]);
     const fetchDatabases = external_react_default().useCallback((ds)=>{
         if (!ds) {
             return undefined;
@@ -866,9 +951,9 @@ function TracesHeader() {
         setDatabases
     ]);
     (0,external_react_.useEffect)(()=>{
-        const datasources = (0,runtime_.getDataSourceSrv)().getList();
-        setDataSource(datasources);
+        setDataSource(allowedDatasources);
     }, [
+        allowedDatasources,
         setDataSource
     ]);
     (0,external_react_.useEffect)(()=>{
@@ -964,10 +1049,11 @@ function TracesHeader() {
         }).subscribe({
             next: ({ data, ok })=>{
                 if (ok) {
+                    var _frame_fields_, _frame_fields_1, _frame_fields_2;
                     const frame = (0,data_.toDataFrame)(data.results.getIndexes.frames[0]);
-                    const values = Array.from(frame.fields[2].values);
-                    const columnNames = Array.from(frame.fields[4].values);
-                    const indexesTypes = Array.from(frame.fields[10].values);
+                    const values = Array.from(((_frame_fields_ = frame.fields[2]) === null || _frame_fields_ === void 0 ? void 0 : _frame_fields_.values) || []);
+                    const columnNames = Array.from(((_frame_fields_1 = frame.fields[4]) === null || _frame_fields_1 === void 0 ? void 0 : _frame_fields_1.values) || []);
+                    const indexesTypes = Array.from(((_frame_fields_2 = frame.fields[10]) === null || _frame_fields_2 === void 0 ? void 0 : _frame_fields_2.values) || []);
                     if (!values || values.length === 0) {
                         setIndexes([]);
                         setCurrentIndex([]);
@@ -997,22 +1083,62 @@ function TracesHeader() {
     }
     function initHeaderData() {
         return _async_to_generator(function*() {
+            var _urlSearchParams_get, _urlSearchParams_get1, _urlSearchParams_get2, _urlSearchParams_get3, _urlSearchParams_get4, _allowedDatasources_;
+            const urlSearchParams = (loc === null || loc === void 0 ? void 0 : loc.searchParams) instanceof URLSearchParams ? loc.searchParams : new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
             const persistedDatasourceStorage = getStoredValue('discover-selected-datasource');
             const persistedDiscoverCurrentStorage = getStoredValue('discover-current');
             const persistedTraceTableStorage = getStoredValue('trace-current-table');
-            const configuredDatasourceUid = resolveDatasourceUid(logsConfig.datasource);
-            const persistedDatasourceUid = (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) || (persistedDatasourceStorage === null || persistedDatasourceStorage === void 0 ? void 0 : persistedDatasourceStorage.uid);
-            const persistedDatabase = discoverCurrent.database || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.database) || '';
-            const persistedTable = currentTable || persistedTraceTableStorage || '';
-            const persistedTimeField = discoverCurrent.timeField || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.timeField) || '';
-            const defaultDatasourceUid = persistedDatasourceUid || configuredDatasourceUid || '';
+            const urlDatasource = resolveDatasourceFromParam(urlSearchParams.get('datasource'), allowedDatasources);
+            const urlDatabase = ((_urlSearchParams_get = urlSearchParams.get('database')) === null || _urlSearchParams_get === void 0 ? void 0 : _urlSearchParams_get.trim()) || '';
+            const urlTable = ((_urlSearchParams_get1 = urlSearchParams.get('table')) === null || _urlSearchParams_get1 === void 0 ? void 0 : _urlSearchParams_get1.trim()) || '';
+            const urlTimeField = ((_urlSearchParams_get2 = urlSearchParams.get('timeField')) === null || _urlSearchParams_get2 === void 0 ? void 0 : _urlSearchParams_get2.trim()) || '';
+            const urlStartTime = parseUrlDate(urlSearchParams.get('startTime'));
+            const urlEndTime = parseUrlDate(urlSearchParams.get('endTime'));
+            const urlTimeRawFrom = ((_urlSearchParams_get3 = urlSearchParams.get('timeRawFrom')) === null || _urlSearchParams_get3 === void 0 ? void 0 : _urlSearchParams_get3.trim()) || '';
+            const urlTimeRawTo = ((_urlSearchParams_get4 = urlSearchParams.get('timeRawTo')) === null || _urlSearchParams_get4 === void 0 ? void 0 : _urlSearchParams_get4.trim()) || '';
+            const configuredDatasourceUid = resolveDatasourceUid(logsConfig.datasource, allowedDatasources);
+            const persistedDatasourceUid = (urlDatasource === null || urlDatasource === void 0 ? void 0 : urlDatasource.uid) || (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) || (persistedDatasourceStorage === null || persistedDatasourceStorage === void 0 ? void 0 : persistedDatasourceStorage.uid);
+            const persistedDatabase = urlDatabase || discoverCurrent.database || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.database) || '';
+            const persistedTable = urlTable || currentTable || persistedTraceTableStorage || '';
+            const persistedTimeField = urlTimeField || discoverCurrent.timeField || (persistedDiscoverCurrentStorage === null || persistedDiscoverCurrentStorage === void 0 ? void 0 : persistedDiscoverCurrentStorage.timeField) || '';
+            const requestedDatasourceUid = persistedDatasourceUid || configuredDatasourceUid || '';
+            const defaultDatasourceUid = requestedDatasourceUid && allowedDatasourceUids.has(requestedDatasourceUid) ? requestedDatasourceUid : ((_allowedDatasources_ = allowedDatasources[0]) === null || _allowedDatasources_ === void 0 ? void 0 : _allowedDatasources_.uid) || '';
             const defaultDatabase = persistedDatabase || logsConfig.database || '';
             const defaultTraceTable = persistedTable || logsConfig.targetTraceTable || logsConfig.logsTable || '';
+            if (urlTimeRawFrom && urlTimeRawTo) {
+                const relativeTimeRange = buildRelativeTimeRange(urlTimeRawFrom, urlTimeRawTo);
+                setCurrentDate([
+                    dayjs_min_default()(relativeTimeRange.from.toDate()),
+                    dayjs_min_default()(relativeTimeRange.to.toDate())
+                ]);
+                setTimeRange((prev)=>_object_spread({}, prev, relativeTimeRange));
+            } else if (urlStartTime && urlEndTime) {
+                setCurrentDate([
+                    urlStartTime,
+                    urlEndTime
+                ]);
+                setTimeRange((prev)=>_object_spread({}, prev, buildAbsoluteTimeRange(urlStartTime, urlEndTime)));
+            }
+            if (allowedDatasources.length === 0) {
+                setSelectedDatasource(undefined);
+                setDatabases([]);
+                setTables([]);
+                setCurrentTable('');
+                setDiscoverCurrent((prev)=>_object_spread_props(_object_spread({}, prev), {
+                        database: '',
+                        table: '',
+                        timeField: ''
+                    }));
+                hasInitializedUrlSyncRef.current = true;
+                return;
+            }
             if (!defaultDatasourceUid || !defaultDatabase) {
+                hasInitializedUrlSyncRef.current = true;
                 return;
             }
             try {
-                const ds = (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) === defaultDatasourceUid ? selectedDatasource : yield (0,runtime_.getDataSourceSrv)().get({
+                var _allowedDatasources_find;
+                const ds = (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) === defaultDatasourceUid ? selectedDatasource : (_allowedDatasources_find = allowedDatasources.find((datasource)=>datasource.uid === defaultDatasourceUid)) !== null && _allowedDatasources_find !== void 0 ? _allowedDatasources_find : yield (0,runtime_.getDataSourceSrv)().get({
                     uid: defaultDatasourceUid
                 });
                 if (!ds) {
@@ -1070,14 +1196,64 @@ function TracesHeader() {
                     source: 'TracesHeader',
                     action: 'initHeaderData'
                 });
+            } finally{
+                hasInitializedUrlSyncRef.current = true;
             }
         })();
     }
     (0,external_react_.useEffect)(()=>{
+        if (datasourcePermissionsLoading || hasInitializedUrlSyncRef.current) {
+            return;
+        }
         void initHeaderData();
     // Initialize once: keep persisted values if they exist; otherwise apply config defaults.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [
+        datasourcePermissionsLoading
+    ]);
+    (0,external_react_.useEffect)(()=>{
+        var _urlSearchParams_get, _urlSearchParams_get1, _timeRange_raw, _timeRange_raw1, _currentDate_, _currentDate_1;
+        if (!hasInitializedUrlSyncRef.current) {
+            return;
+        }
+        const urlSearchParams = new URLSearchParams(locSearch);
+        const urlTimeRawFrom = ((_urlSearchParams_get = urlSearchParams.get('timeRawFrom')) === null || _urlSearchParams_get === void 0 ? void 0 : _urlSearchParams_get.trim()) || '';
+        const urlTimeRawTo = ((_urlSearchParams_get1 = urlSearchParams.get('timeRawTo')) === null || _urlSearchParams_get1 === void 0 ? void 0 : _urlSearchParams_get1.trim()) || '';
+        const urlStartTime = parseUrlDate(urlSearchParams.get('startTime'));
+        const urlEndTime = parseUrlDate(urlSearchParams.get('endTime'));
+        const rawFrom = normalizeRawTimeValue(timeRange === null || timeRange === void 0 ? void 0 : (_timeRange_raw = timeRange.raw) === null || _timeRange_raw === void 0 ? void 0 : _timeRange_raw.from);
+        const rawTo = normalizeRawTimeValue(timeRange === null || timeRange === void 0 ? void 0 : (_timeRange_raw1 = timeRange.raw) === null || _timeRange_raw1 === void 0 ? void 0 : _timeRange_raw1.to);
+        const shouldShareRelativeRaw = isRelativeRawRange(timeRange === null || timeRange === void 0 ? void 0 : timeRange.raw);
+        const currentStartTime = (_currentDate_ = _currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU);
+        const currentEndTime = (_currentDate_1 = _currentDate[1]) === null || _currentDate_1 === void 0 ? void 0 : _currentDate_1.format(constants/* FORMAT_DATE */.fU);
+        const hasRelativeTimeParams = Boolean(urlTimeRawFrom && urlTimeRawTo);
+        const hasAbsoluteTimeParams = Boolean(urlStartTime && urlEndTime);
+        const isRelativeTimeSynced = hasRelativeTimeParams && rawFrom === urlTimeRawFrom && rawTo === urlTimeRawTo;
+        const isAbsoluteTimeSynced = hasAbsoluteTimeParams && !shouldShareRelativeRaw && currentStartTime === (urlStartTime === null || urlStartTime === void 0 ? void 0 : urlStartTime.format(constants/* FORMAT_DATE */.fU)) && currentEndTime === (urlEndTime === null || urlEndTime === void 0 ? void 0 : urlEndTime.format(constants/* FORMAT_DATE */.fU));
+        if ((hasRelativeTimeParams || hasAbsoluteTimeParams) && !isRelativeTimeSynced && !isAbsoluteTimeSynced) {
+            return;
+        }
+        updateShareParams({
+            datasource: (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.uid) || (selectedDatasource === null || selectedDatasource === void 0 ? void 0 : selectedDatasource.name) || '',
+            database: discoverCurrent.database,
+            table: currentTable || discoverCurrent.table,
+            timeField: currentTimeField,
+            startTime: shouldShareRelativeRaw ? undefined : currentStartTime,
+            endTime: shouldShareRelativeRaw ? undefined : currentEndTime,
+            timeRawFrom: shouldShareRelativeRaw ? rawFrom : undefined,
+            timeRawTo: shouldShareRelativeRaw ? rawTo : undefined
+        });
+    }, [
+        currentTable,
+        currentTimeField,
+        _currentDate,
+        discoverCurrent.database,
+        discoverCurrent.table,
+        locSearch,
+        selectedDatasource,
+        timeRange === null || timeRange === void 0 ? void 0 : timeRange.raw,
+        updateShareParams
+    ]);
     return /*#__PURE__*/ external_react_default().createElement("div", {
         className: (0,css_.css)`
                 padding: 1rem;
@@ -1088,16 +1264,25 @@ function TracesHeader() {
                 border-bottom: 1px solid ${theme.colors.border.medium};
             `
     }, /*#__PURE__*/ external_react_default().createElement(DiscoverHeaderSearch, null, /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
-        label: "Datasource"
+        label: "Datasource",
+        description: datasourcePermissionsError ? 'Failed to load team datasource permissions' : undefined
     }, /*#__PURE__*/ external_react_default().createElement(runtime_.DataSourcePicker, {
         width: 20,
         type: 'mysql',
         current: selectedDatasource,
         placeholder: "Choose",
         noDefault: true,
-        filter: (ds)=>ds.type === 'mysql',
+        disabled: datasourcePermissionsLoading || allowedDatasources.length === 0,
+        isLoading: datasourcePermissionsLoading,
+        filter: (ds)=>ds.type === 'mysql' && allowedDatasourceUids.has(ds.uid),
         onChange: (item)=>{
+            if (!allowedDatasourceUids.has(item.uid)) {
+                return;
+            }
             setSelectedDatasource(item);
+            updateShareParams({
+                datasource: (item === null || item === void 0 ? void 0 : item.uid) || (item === null || item === void 0 ? void 0 : item.name) || ''
+            });
         }
     })), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
         label: "Database",
@@ -1112,6 +1297,9 @@ function TracesHeader() {
             setDiscoverCurrent(_object_spread_props(_object_spread({}, discoverCurrent), {
                 database: selectedDatabase.value
             }));
+            updateShareParams({
+                database: selectedDatabase.value
+            });
             (0,metaservice/* getTablesService */.Rw)({
                 selectdbDS,
                 database: selectedDatabase.value
@@ -1148,6 +1336,9 @@ function TracesHeader() {
                 table: selectedTable.value
             }));
             setCurrentTable(selectedTable.value);
+            updateShareParams({
+                table: selectedTable.value
+            });
             getFields(selectedTable);
             getIndexes(selectedTable);
         }
@@ -1160,12 +1351,8 @@ function TracesHeader() {
             setDiscoverCurrent(_object_spread_props(_object_spread({}, discoverCurrent), {
                 timeField: selectdbTimeFiled.value
             }));
-            setLoc((prev)=>{
-                const searchParams = prev.searchParams;
-                searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('timeField', selectdbTimeFiled.value);
-                return _object_spread_props(_object_spread({}, prev), {
-                    searchParams
-                });
+            updateShareParams({
+                timeField: selectdbTimeFiled.value
             });
         },
         placeholder: 'Time Field'
@@ -1178,28 +1365,61 @@ function TracesHeader() {
     }, /*#__PURE__*/ external_react_default().createElement(ui_.TimeRangeInput, {
         isReversed: false,
         onChange: (timeRange)=>{
+            var _timeRange_raw, _timeRange_raw1;
             const start = dayjs_min_default()(timeRange.from.toDate());
             const end = dayjs_min_default()(timeRange.to.toDate());
-            setLoc((prev)=>{
-                const searchParams = prev.searchParams;
-                searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('startTime', start.format(constants/* FORMAT_DATE */.fU));
-                searchParams === null || searchParams === void 0 ? void 0 : searchParams.set('endTime', end.format(constants/* FORMAT_DATE */.fU));
-                return _object_spread_props(_object_spread({}, prev), {
-                    searchParams
-                });
-            });
+            const rawFrom = normalizeRawTimeValue((_timeRange_raw = timeRange.raw) === null || _timeRange_raw === void 0 ? void 0 : _timeRange_raw.from);
+            const rawTo = normalizeRawTimeValue((_timeRange_raw1 = timeRange.raw) === null || _timeRange_raw1 === void 0 ? void 0 : _timeRange_raw1.to);
+            const hasRelativeRaw = isRelativeRawRange(timeRange.raw);
             setCurrentDate([
                 start,
                 end
             ]);
-            setTimeRange(timeRange);
+            setTimeRange({
+                from: (0,data_.dateTime)(timeRange.from.toDate()),
+                to: (0,data_.dateTime)(timeRange.to.toDate()),
+                raw: hasRelativeRaw && rawFrom && rawTo ? {
+                    from: rawFrom,
+                    to: rawTo
+                } : {
+                    from: (0,data_.dateTime)(timeRange.from.toDate()),
+                    to: (0,data_.dateTime)(timeRange.to.toDate())
+                }
+            });
+            updateShareParams({
+                startTime: hasRelativeRaw ? undefined : start.format(constants/* FORMAT_DATE */.fU),
+                endTime: hasRelativeRaw ? undefined : end.format(constants/* FORMAT_DATE */.fU),
+                timeRawFrom: hasRelativeRaw ? rawFrom : undefined,
+                timeRawTo: hasRelativeRaw ? rawTo : undefined
+            });
         },
         value: timeRange
     }))));
 }
 
+// EXTERNAL MODULE: ./utils/time.ts
+var time = __webpack_require__(1157);
 // EXTERNAL MODULE: ./services/traces.ts + 1 modules
 var services_traces = __webpack_require__(3764);
+;// ../node_modules/lucide-react/dist/esm/icons/x.js
+/**
+ * @license lucide-react v0.513.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+
+
+
+const x_iconNode = [
+  ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
+  ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
+];
+const X = createLucideIcon("x", x_iconNode);
+
+
+//# sourceMappingURL=x.js.map
+
 ;// ./pages/PageTrace.tsx
 function PageTrace_define_property(obj, key, value) {
     if (key in obj) {
@@ -1268,6 +1488,36 @@ function PageTrace_object_spread_props(target, source) {
 
 
 
+
+
+
+function getFirstResultError(error) {
+    var _error_data, _error_response_data, _error_response;
+    const results = (error === null || error === void 0 ? void 0 : (_error_data = error.data) === null || _error_data === void 0 ? void 0 : _error_data.results) || (error === null || error === void 0 ? void 0 : (_error_response = error.response) === null || _error_response === void 0 ? void 0 : (_error_response_data = _error_response.data) === null || _error_response_data === void 0 ? void 0 : _error_response_data.results);
+    if (!results) {
+        return undefined;
+    }
+    const refId = Object.keys(results).find((key)=>{
+        var _results_key, _results_key1;
+        return ((_results_key = results[key]) === null || _results_key === void 0 ? void 0 : _results_key.error) || ((_results_key1 = results[key]) === null || _results_key1 === void 0 ? void 0 : _results_key1.status) >= 400;
+    });
+    if (!refId) {
+        return undefined;
+    }
+    return PageTrace_object_spread({
+        refId
+    }, results[refId]);
+}
+function getErrorText(error) {
+    var _error_data, _error_response_data, _error_response;
+    const resultError = getFirstResultError(error);
+    return (error === null || error === void 0 ? void 0 : error.backendError) || (resultError === null || resultError === void 0 ? void 0 : resultError.error) || (error === null || error === void 0 ? void 0 : (_error_data = error.data) === null || _error_data === void 0 ? void 0 : _error_data.message) || (error === null || error === void 0 ? void 0 : (_error_response = error.response) === null || _error_response === void 0 ? void 0 : (_error_response_data = _error_response.data) === null || _error_response_data === void 0 ? void 0 : _error_response_data.message) || (error === null || error === void 0 ? void 0 : error.statusText) || (error === null || error === void 0 ? void 0 : error.message) || 'Request failed';
+}
+function hasQueryResultError(data) {
+    return getFirstResultError({
+        data
+    });
+}
 function PageTrace() {
     const theme = (0,ui_.useTheme2)();
     const currentTimeField = (0,react/* useAtomValue */.md)(discover/* currentTimeFieldAtom */.CA);
@@ -1275,6 +1525,7 @@ function PageTrace() {
     const currentCatalog = (0,react/* useAtomValue */.md)(discover/* currentCatalogAtom */.K0);
     const currentDatabase = (0,react/* useAtomValue */.md)(discover/* currentDatabaseAtom */.Cf);
     const currentDate = (0,react/* useAtomValue */.md)(discover/* currentDateAtom */.Zb);
+    const timeZone = (0,react/* useAtomValue */.md)(discover/* timeZoneAtom */.tF);
     const selectdbDS = (0,react/* useAtomValue */.md)(discover/* selectedDatasourceAtom */.SW);
     const [page, setPage] = (0,react/* useAtom */.fp)(discover/* pageAtom */.fs);
     const pageSize = (0,react/* useAtomValue */.md)(discover/* pageSizeAtom */.Ol);
@@ -1282,15 +1533,83 @@ function PageTrace() {
     const setTracesServices = (0,react/* useSetAtom */.Xr)(store_traces/* tracesServicesAtom */.E);
     const setTraceOperations = (0,react/* useSetAtom */.Xr)(store_traces/* traceOperationsAtom */.VA);
     const [loading, setLoading] = external_react_default().useState(false);
+    const [traceError, setTraceError] = external_react_default().useState('');
     const currentService = (0,react/* useAtomValue */.md)(store_traces/* currentServiceAtom */.gL);
     const currentOperation = (0,react/* useAtomValue */.md)(store_traces/* currentOperationAtom */.mH);
     const tags = (0,react/* useAtomValue */.md)(store_traces/* tagsAtom */.jB);
     const minDuration = (0,react/* useAtomValue */.md)(store_traces/* minDurationAtom */.oC);
     const maxDuration = (0,react/* useAtomValue */.md)(store_traces/* maxDurationAtom */.uS);
     const sort = (0,react/* useAtomValue */.md)(store_traces/* currentSortAtom */.fy);
-    const getTraces = external_react_default().useCallback(()=>{
-        var _currentDate_;
-        if (!currentTable || !currentDatabase || !selectdbDS) {
+    const context = (0,data_.usePluginContext)();
+    const jsonData = context.meta.jsonData || {};
+    const rawLogsConfig = jsonData.logsConfig;
+    const logsConfig = (0,plugin_settings/* mergeLogsConfig */.oW)(rawLogsConfig);
+    const configuredTraceTable = logsConfig.targetTraceTable || '';
+    const hasExplicitTraceTableConfig = Boolean(rawLogsConfig === null || rawLogsConfig === void 0 ? void 0 : rawLogsConfig.targetTraceTable);
+    const showTraceError = external_react_default().useCallback((content, duration = 5)=>{
+        setTraceError(content);
+        if (duration > 0) {
+            window.setTimeout(()=>{
+                setTraceError((currentError)=>currentError === content ? '' : currentError);
+            }, duration * 1000);
+        }
+    }, []);
+    const showTraceSetupError = external_react_default().useCallback((action)=>{
+        if (!selectdbDS) {
+            showTraceError(`Cannot ${action}: no Doris datasource is selected. Select a datasource first.`);
+            return true;
+        }
+        if (!currentDatabase) {
+            showTraceError(`Cannot ${action}: no database is selected. Select a database first.`);
+            return true;
+        }
+        if (!currentTable) {
+            showTraceError(hasExplicitTraceTableConfig ? `Cannot ${action}: the configured trace table "${configuredTraceTable}" is not selected. Switch to that table before querying.` : `Cannot ${action}: no trace table is selected. Select a trace table, or configure a default trace table in app settings.`);
+            return true;
+        }
+        if (!currentTimeField) {
+            showTraceError(`Cannot ${action}: no time field is selected. Select a time field first.`);
+            return true;
+        }
+        return false;
+    }, [
+        configuredTraceTable,
+        currentDatabase,
+        currentTable,
+        currentTimeField,
+        hasExplicitTraceTableConfig,
+        selectdbDS,
+        showTraceError
+    ]);
+    const showTraceQueryError = external_react_default().useCallback((err, requestKind)=>{
+        if (showTraceSetupError(requestKind === 'traces' ? 'query traces' : `load trace ${requestKind}`)) {
+            return;
+        }
+        if (hasExplicitTraceTableConfig && currentTable !== configuredTraceTable) {
+            showTraceError(`Cannot query traces from "${currentTable}": the configured trace table is "${configuredTraceTable}". Switch to the configured trace table and try again.`);
+            return;
+        }
+        const backendMessage = getErrorText(err);
+        const tableContext = `"${currentDatabase}.${currentTable}"`;
+        if (requestKind === 'services') {
+            showTraceError(`Failed to load trace services from ${tableContext}. Verify the table, time field, and Doris permissions. Backend: ${backendMessage}`);
+            return;
+        }
+        if (requestKind === 'operations') {
+            showTraceError(`Failed to load trace operations from ${tableContext}. Verify the table, time field, service filter, and Doris permissions. Backend: ${backendMessage}`);
+            return;
+        }
+        showTraceError(`Trace query failed for ${tableContext}. Verify the trace schema includes required columns such as trace_id, span_id, parent_span_id, span_name, service_name, timestamp, duration, and status_code. Backend: ${backendMessage}`, 6);
+    }, [
+        configuredTraceTable,
+        currentDatabase,
+        currentTable,
+        hasExplicitTraceTableConfig,
+        showTraceError,
+        showTraceSetupError
+    ]);
+    const getTraces = external_react_default().useCallback((nextPage = page, nextSort = sort)=>{
+        if (showTraceSetupError('query traces')) {
             return;
         }
         setLoading(true);
@@ -1299,14 +1618,16 @@ function PageTrace() {
             database: currentDatabase,
             table: currentTable,
             timeField: currentTimeField,
-            startDate: (_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU),
-            endDate: currentDate[1].format(constants/* FORMAT_DATE */.fU),
+            startDate: currentDate[0] ? (0,time/* formatTimeInZone */.Oh)(currentDate[0], timeZone) : undefined,
+            endDate: (0,time/* formatTimeInZone */.Oh)(currentDate[1], timeZone),
+            startEpoch: (0,time/* toEpochSeconds */.mL)(currentDate[0]),
+            endEpoch: (0,time/* toEpochSeconds */.mL)(currentDate[1]),
             cluster: '',
-            page: page,
+            page: nextPage,
             page_size: pageSize,
             service_name: currentService.value,
             operation: currentOperation.value,
-            sortBy: sort
+            sortBy: nextSort
         };
         if (minDuration) {
             payload.minDuration = minDuration;
@@ -1319,9 +1640,22 @@ function PageTrace() {
         }
         (0,services_traces/* getTracesService */.Cy)(PageTrace_object_spread({
             selectdbDS
-        }, payload)).subscribe({
+        }, payload), {
+            showBackendError: false
+        }).subscribe({
             next: ({ data, ok })=>{
                 setLoading(false);
+                const resultError = hasQueryResultError(data);
+                if (!ok || resultError) {
+                    showTraceQueryError({
+                        data,
+                        backendError: resultError === null || resultError === void 0 ? void 0 : resultError.error,
+                        backendStatus: resultError === null || resultError === void 0 ? void 0 : resultError.status,
+                        errorSource: resultError === null || resultError === void 0 ? void 0 : resultError.errorSource,
+                        refId: resultError === null || resultError === void 0 ? void 0 : resultError.refId
+                    }, 'traces');
+                    return;
+                }
                 if (ok) {
                     const rowsData = (0,utils_data/* convertColumnToRow */.HL)(data.results.getTraces.frames[0]);
                     const formateData = rowsData.map((item)=>{
@@ -1339,6 +1673,7 @@ function PageTrace() {
                     source: 'PageTrace',
                     action: 'getTraces'
                 });
+                showTraceQueryError(err, 'traces');
             }
         });
     }, [
@@ -1356,11 +1691,12 @@ function PageTrace() {
         maxDuration,
         tags,
         selectdbDS,
-        setTraces
+        setTraces,
+        showTraceSetupError,
+        showTraceQueryError
     ]);
     const getTracesServices = external_react_default().useCallback(()=>{
-        var _currentDate_;
-        if (!currentTable || !currentDatabase || !selectdbDS) {
+        if (!currentTable || !currentDatabase || !selectdbDS || !currentTimeField) {
             return;
         }
         let payload = {
@@ -1368,18 +1704,34 @@ function PageTrace() {
             database: currentDatabase,
             table: currentTable,
             timeField: currentTimeField,
-            startDate: (_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU),
-            endDate: currentDate[1].format(constants/* FORMAT_DATE */.fU),
+            startDate: currentDate[0] ? (0,time/* formatTimeInZone */.Oh)(currentDate[0], timeZone) : undefined,
+            endDate: (0,time/* formatTimeInZone */.Oh)(currentDate[1], timeZone),
+            startEpoch: (0,time/* toEpochSeconds */.mL)(currentDate[0]),
+            endEpoch: (0,time/* toEpochSeconds */.mL)(currentDate[1]),
             cluster: ''
         };
         (0,services_traces/* getServiceListService */.FC)(PageTrace_object_spread({
             selectdbDS
-        }, payload)).subscribe({
+        }, payload), {
+            showBackendError: false
+        }).subscribe({
             next: ({ data, ok })=>{
                 setLoading(false);
+                const resultError = hasQueryResultError(data);
+                if (!ok || resultError) {
+                    showTraceQueryError({
+                        data,
+                        backendError: resultError === null || resultError === void 0 ? void 0 : resultError.error,
+                        backendStatus: resultError === null || resultError === void 0 ? void 0 : resultError.status,
+                        errorSource: resultError === null || resultError === void 0 ? void 0 : resultError.errorSource,
+                        refId: resultError === null || resultError === void 0 ? void 0 : resultError.refId
+                    }, 'services');
+                    return;
+                }
                 if (ok) {
+                    var _frame_fields_;
                     const frame = (0,data_.toDataFrame)(data.results.getServiceList.frames[0]);
-                    const values = Array.from(frame.fields[0].values);
+                    const values = Array.from(((_frame_fields_ = frame.fields[0]) === null || _frame_fields_ === void 0 ? void 0 : _frame_fields_.values) || []);
                     if (values) {
                         const options = values.map((item)=>{
                             return {
@@ -1400,6 +1752,7 @@ function PageTrace() {
                     source: 'PageTrace',
                     action: 'getTracesServices'
                 });
+                showTraceQueryError(err, 'services');
             }
         });
     }, [
@@ -1409,30 +1762,49 @@ function PageTrace() {
         currentTable,
         currentTimeField,
         selectdbDS,
-        setTracesServices
+        setTracesServices,
+        showTraceQueryError
     ]);
     const getTracesOperations = external_react_default().useCallback(()=>{
-        var _currentDate_;
+        if (!currentTable || !currentDatabase || !selectdbDS || !currentTimeField) {
+            return;
+        }
         let payload = {
             catalog: currentCatalog,
             database: currentDatabase,
             table: currentTable,
             timeField: currentTimeField,
-            startDate: (_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU),
-            endDate: currentDate[1].format(constants/* FORMAT_DATE */.fU),
+            startDate: currentDate[0] ? (0,time/* formatTimeInZone */.Oh)(currentDate[0], timeZone) : undefined,
+            endDate: (0,time/* formatTimeInZone */.Oh)(currentDate[1], timeZone),
+            startEpoch: (0,time/* toEpochSeconds */.mL)(currentDate[0]),
+            endEpoch: (0,time/* toEpochSeconds */.mL)(currentDate[1]),
             service_name: currentService.value,
             cluster: ''
         };
         (0,services_traces/* getOperationListService */.jo)(PageTrace_object_spread({
             selectdbDS
-        }, payload)).subscribe({
+        }, payload), {
+            showBackendError: false
+        }).subscribe({
             next: ({ data, ok })=>{
                 setLoading(false);
+                const resultError = hasQueryResultError(data);
+                if (!ok || resultError) {
+                    showTraceQueryError({
+                        data,
+                        backendError: resultError === null || resultError === void 0 ? void 0 : resultError.error,
+                        backendStatus: resultError === null || resultError === void 0 ? void 0 : resultError.status,
+                        errorSource: resultError === null || resultError === void 0 ? void 0 : resultError.errorSource,
+                        refId: resultError === null || resultError === void 0 ? void 0 : resultError.refId
+                    }, 'operations');
+                    return;
+                }
                 if (ok) {
+                    var _data_results_getOperationList_frames__data_values, _data_results_getOperationList_frames__data, _data_results_getOperationList_frames_;
                     // const frame = toDataFrame(data.results.getOperationList.frames[0]);
                     // const values = Array.from(frame.fields[0].values);
                     // const values = frame.data.values
-                    const values = data.results.getOperationList.frames[0].data.values[0];
+                    const values = ((_data_results_getOperationList_frames_ = data.results.getOperationList.frames[0]) === null || _data_results_getOperationList_frames_ === void 0 ? void 0 : (_data_results_getOperationList_frames__data = _data_results_getOperationList_frames_.data) === null || _data_results_getOperationList_frames__data === void 0 ? void 0 : (_data_results_getOperationList_frames__data_values = _data_results_getOperationList_frames__data.values) === null || _data_results_getOperationList_frames__data_values === void 0 ? void 0 : _data_results_getOperationList_frames__data_values[0]) || [];
                     if (values) {
                         const options = values.map((item)=>{
                             return {
@@ -1457,6 +1829,7 @@ function PageTrace() {
                     source: 'PageTrace',
                     action: 'getTracesOperations'
                 });
+                showTraceQueryError(err, 'operations');
             }
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1468,49 +1841,8 @@ function PageTrace() {
         currentTable,
         currentTimeField,
         selectdbDS,
-        setTraceOperations
-    ]);
-    (0,external_react_.useEffect)(()=>{
-        if (currentTimeField && currentTable && currentCatalog && currentDatabase && currentDate) {
-            getTraces();
-        }
-    }, [
-        page,
-        pageSize,
-        currentTimeField,
-        currentDate,
-        sort,
-        currentTable,
-        currentCatalog,
-        currentDatabase,
-        selectdbDS,
-        getTraces
-    ]);
-    (0,external_react_.useEffect)(()=>{
-        if (currentTimeField && currentTable && currentCatalog && currentDatabase && currentDate) {
-            getTracesServices();
-        }
-    }, [
-        currentTimeField,
-        currentDate,
-        sort,
-        currentTable,
-        currentCatalog,
-        currentDatabase,
-        selectdbDS,
-        getTracesServices
-    ]);
-    (0,external_react_.useEffect)(()=>{
-        if (currentTimeField && currentTable && currentCatalog && currentDatabase && currentService) {
-            getTracesOperations();
-        }
-    }, [
-        currentTimeField,
-        currentService,
-        getTracesOperations,
-        currentTable,
-        currentCatalog,
-        currentDatabase
+        setTraceOperations,
+        showTraceQueryError
     ]);
     return /*#__PURE__*/ external_react_default().createElement("div", {
         className: (0,css_.css)`
@@ -1529,7 +1861,57 @@ function PageTrace() {
         pageNav: {
             text: ''
         }
-    }, /*#__PURE__*/ external_react_default().createElement(TracesHeader, null), /*#__PURE__*/ external_react_default().createElement("div", {
+    }, /*#__PURE__*/ external_react_default().createElement(TracesHeader, null), traceError && /*#__PURE__*/ external_react_default().createElement("div", {
+        role: "alert",
+        className: (0,css_.css)`
+                            position: fixed;
+                            top: 72px;
+                            right: 24px;
+                            z-index: 1000;
+                            display: flex;
+                            align-items: flex-start;
+                            gap: 12px;
+                            width: min(520px, calc(100vw - 48px));
+                            padding: 12px 12px 12px 16px;
+                            border-radius: 4px;
+                            background: ${theme.colors.error.main};
+                            color: ${theme.colors.error.contrastText};
+                            box-shadow: ${theme.shadows.z3};
+                            font-size: 14px;
+                            line-height: 20px;
+                        `
+    }, /*#__PURE__*/ external_react_default().createElement("div", {
+        className: (0,css_.css)`
+                                flex: 1;
+                                min-width: 0;
+                                overflow-wrap: anywhere;
+                            `
+    }, traceError), /*#__PURE__*/ external_react_default().createElement("button", {
+        type: "button",
+        "aria-label": "Close trace error",
+        onClick: ()=>setTraceError(''),
+        className: (0,css_.css)`
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                width: 24px;
+                                height: 24px;
+                                flex: 0 0 24px;
+                                border: 0;
+                                border-radius: 4px;
+                                padding: 0;
+                                background: transparent;
+                                color: ${theme.colors.error.contrastText};
+                                cursor: pointer;
+
+                                &:hover {
+                                    background: ${theme.colors.action.hover};
+                                }
+                            `
+    }, /*#__PURE__*/ external_react_default().createElement(X, {
+        size: 16,
+        "aria-hidden": "true"
+    }))), /*#__PURE__*/ external_react_default().createElement("div", {
         className: (0,css_.css)`
                         display: flex;
                         height: calc(100% - 103px);
@@ -1548,7 +1930,9 @@ function PageTrace() {
     }, /*#__PURE__*/ external_react_default().createElement(SearchSidebar, {
         onQuerying: ()=>{
             setPage(1);
-            getTraces();
+            getTracesServices();
+            getTracesOperations();
+            getTraces(1);
         }
     })), /*#__PURE__*/ external_react_default().createElement("main", {
         className: (0,css_.css)`
@@ -1560,7 +1944,8 @@ function PageTrace() {
     }, loading && /*#__PURE__*/ external_react_default().createElement(ui_.LoadingBar, {
         width: 100
     }), /*#__PURE__*/ external_react_default().createElement(TraceView, {
-        traces: traces
+        traces: traces,
+        onSortByChange: (nextSort)=>getTraces(1, nextSort)
     })))));
 }
 
@@ -1568,4 +1953,4 @@ function PageTrace() {
 /***/ }
 
 }]);
-//# sourceMappingURL=600.js.map?_cache=b936f1dc3baec3e6a6a4
+//# sourceMappingURL=260.js.map?_cache=88eb325c74d54d799e5a

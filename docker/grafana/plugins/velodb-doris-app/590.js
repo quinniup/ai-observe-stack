@@ -1,5 +1,5 @@
 "use strict";
-(self["webpackChunkvelodb_doris_app"] = self["webpackChunkvelodb_doris_app"] || []).push([[131],{
+(self["webpackChunkvelodb_doris_app"] = self["webpackChunkvelodb_doris_app"] || []).push([[590],{
 
 /***/ 6472
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
@@ -15,6 +15,34 @@
 /* harmony import */ var _grafana_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8531);
 /* harmony import */ var _grafana_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_grafana_runtime__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _utils_errors__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9071);
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
 
 
 
@@ -28,30 +56,151 @@ function showGlobalError(msg) {
         duration: 3
     });
 }
+function getFirstResultError(data) {
+    const results = data === null || data === void 0 ? void 0 : data.results;
+    if (!results) {
+        return undefined;
+    }
+    const refId = Object.keys(results).find((key)=>{
+        var _results_key, _results_key1;
+        return ((_results_key = results[key]) === null || _results_key === void 0 ? void 0 : _results_key.error) || ((_results_key1 = results[key]) === null || _results_key1 === void 0 ? void 0 : _results_key1.status) >= 400;
+    });
+    if (!refId) {
+        return undefined;
+    }
+    return _object_spread({
+        refId
+    }, results[refId]);
+}
 function getErrorText(error) {
-    var _error_data_results_Object_keys_, _Object_keys, _error_data, _error_data1;
-    return (error === null || error === void 0 ? void 0 : (_error_data1 = error.data) === null || _error_data1 === void 0 ? void 0 : (_error_data_results_Object_keys_ = _error_data1.results[(_Object_keys = Object.keys(error === null || error === void 0 ? void 0 : (_error_data = error.data) === null || _error_data === void 0 ? void 0 : _error_data.results)) === null || _Object_keys === void 0 ? void 0 : _Object_keys[0]]) === null || _error_data_results_Object_keys_ === void 0 ? void 0 : _error_data_results_Object_keys_.error) || error.statusText || 'Request failed';
+    var _error_response, _responseData_error;
+    const responseData = (error === null || error === void 0 ? void 0 : error.data) || (error === null || error === void 0 ? void 0 : (_error_response = error.response) === null || _error_response === void 0 ? void 0 : _error_response.data);
+    const resultError = getFirstResultError(responseData);
+    return (error === null || error === void 0 ? void 0 : error.backendError) || (resultError === null || resultError === void 0 ? void 0 : resultError.error) || (responseData === null || responseData === void 0 ? void 0 : (_responseData_error = responseData.error) === null || _responseData_error === void 0 ? void 0 : _responseData_error.message) || (responseData === null || responseData === void 0 ? void 0 : responseData.message) || (error === null || error === void 0 ? void 0 : error.statusText) || (error === null || error === void 0 ? void 0 : error.message) || 'Request failed';
+}
+function createBackendError(res, defaultMessage) {
+    const resultError = getFirstResultError(res === null || res === void 0 ? void 0 : res.data);
+    const err = new Error(getErrorText({
+        data: res === null || res === void 0 ? void 0 : res.data,
+        statusText: res === null || res === void 0 ? void 0 : res.statusText,
+        message: defaultMessage
+    }));
+    err.name = 'BackendQueryError';
+    err.data = res === null || res === void 0 ? void 0 : res.data;
+    err.status = res === null || res === void 0 ? void 0 : res.status;
+    err.statusText = res === null || res === void 0 ? void 0 : res.statusText;
+    err.backendError = resultError === null || resultError === void 0 ? void 0 : resultError.error;
+    err.backendStatus = resultError === null || resultError === void 0 ? void 0 : resultError.status;
+    err.errorSource = resultError === null || resultError === void 0 ? void 0 : resultError.errorSource;
+    err.refId = resultError === null || resultError === void 0 ? void 0 : resultError.refId;
+    return err;
 }
 function withErrorHandler(source$, options) {
     const { showBackendError = true, defaultMessage = 'Request failed' } = options || {};
     return source$.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__/* .map */ .T)((res)=>{
-        if ((res === null || res === void 0 ? void 0 : res.ok) === false) {
-            var _res_data_error, _res_data, _res_data1;
-            const errMsg = (res === null || res === void 0 ? void 0 : (_res_data = res.data) === null || _res_data === void 0 ? void 0 : (_res_data_error = _res_data.error) === null || _res_data_error === void 0 ? void 0 : _res_data_error.message) || (res === null || res === void 0 ? void 0 : (_res_data1 = res.data) === null || _res_data1 === void 0 ? void 0 : _res_data1.message) || defaultMessage;
-            if (showBackendError) {
-                var _res_data2;
-                showGlobalError(getErrorText(res === null || res === void 0 ? void 0 : (_res_data2 = res.data) === null || _res_data2 === void 0 ? void 0 : _res_data2.error));
-            }
-            throw new Error(errMsg);
+        const resultError = getFirstResultError(res === null || res === void 0 ? void 0 : res.data);
+        if ((res === null || res === void 0 ? void 0 : res.ok) === false || resultError) {
+            throw createBackendError(res, defaultMessage);
         }
         return res;
     }), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__/* .catchError */ .W)((err)=>{
         (0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_4__.logError)((0,_utils_errors__WEBPACK_IMPORTED_MODULE_5__/* .toError */ .i)(err), {
             source: 'withErrorHandler'
         });
-        showGlobalError(getErrorText(err));
+        if (showBackendError) {
+            showGlobalError(getErrorText(err));
+        }
         return (0,rxjs__WEBPACK_IMPORTED_MODULE_0__.throwError)(()=>err);
     }));
+}
+
+
+/***/ },
+
+/***/ 7116
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ho: () => (/* binding */ filterDatasourcesByTeamPermissions),
+/* harmony export */   jS: () => (/* binding */ fetchTeams),
+/* harmony export */   lp: () => (/* binding */ fetchCurrentUserTeams),
+/* harmony export */   tH: () => (/* binding */ getMysqlDatasources)
+/* harmony export */ });
+/* harmony import */ var _grafana_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8531);
+/* harmony import */ var _grafana_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_grafana_runtime__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1269);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(rxjs__WEBPACK_IMPORTED_MODULE_1__);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function _async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
+
+
+function fetchCurrentUserTeams() {
+    return _async_to_generator(function*() {
+        const response = yield (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.lastValueFrom)((0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_0__.getBackendSrv)().fetch({
+            url: '/api/user/teams',
+            method: 'GET'
+        }));
+        return Array.isArray(response.data) ? response.data : [];
+    })();
+}
+function fetchTeams() {
+    return _async_to_generator(function*() {
+        var _response_data;
+        const response = yield (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.lastValueFrom)((0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_0__.getBackendSrv)().fetch({
+            url: '/api/teams/search?perpage=100&page=1',
+            method: 'GET'
+        }));
+        return Array.isArray((_response_data = response.data) === null || _response_data === void 0 ? void 0 : _response_data.teams) ? response.data.teams : [];
+    })();
+}
+function getMysqlDatasources(datasources) {
+    return datasources.filter((ds)=>ds.type === 'mysql');
+}
+function filterDatasourcesByTeamPermissions(datasources, teams, permissions = []) {
+    const mysqlDatasources = getMysqlDatasources(datasources);
+    if (teams.length === 0) {
+        return mysqlDatasources;
+    }
+    const teamIds = new Set(teams.map((team)=>team.id));
+    const allowedDatasourceUids = new Set();
+    permissions.forEach((permission)=>{
+        if (!teamIds.has(permission.teamId)) {
+            return;
+        }
+        permission.datasourceUids.forEach((uid)=>{
+            if (uid) {
+                allowedDatasourceUids.add(uid);
+            }
+        });
+    });
+    return mysqlDatasources.filter((ds)=>allowedDatasourceUids.has(ds.uid));
 }
 
 
@@ -65,10 +214,11 @@ function withErrorHandler(source$, options) {
 /* harmony export */   H1: () => (/* binding */ getFieldsService),
 /* harmony export */   Hm: () => (/* binding */ getDatabases),
 /* harmony export */   Rw: () => (/* binding */ getTablesService),
+/* harmony export */   UD: () => (/* binding */ getApplicationValuesService),
 /* harmony export */   bf: () => (/* binding */ getColumn),
 /* harmony export */   s1: () => (/* binding */ getIndexesService)
 /* harmony export */ });
-/* unused harmony export getColumnFromFieldService */
+/* unused harmony exports getApplicationValuesSQL, getColumnFromFieldService */
 /* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7781);
 /* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_grafana_data__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _grafana_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8531);
@@ -77,6 +227,7 @@ function withErrorHandler(source$, options) {
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(rxjs__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _components_with_error_handler_withErrorHandler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6472);
 /* harmony import */ var _utils_errors__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9071);
+/* harmony import */ var _utils_sql_filter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(2721);
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
         var info = gen[key](arg);
@@ -158,6 +309,43 @@ function _object_spread_props(target, source) {
     }
     return target;
 }
+function _object_without_properties(source, excluded) {
+    if (source == null) return {};
+    var target = {}, sourceKeys, key, i;
+    if (typeof Reflect !== "undefined" && Reflect.ownKeys) {
+        sourceKeys = Reflect.ownKeys(Object(source));
+        for(i = 0; i < sourceKeys.length; i++){
+            key = sourceKeys[i];
+            if (excluded.indexOf(key) >= 0) continue;
+            if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+            target[key] = source[key];
+        }
+        return target;
+    }
+    target = _object_without_properties_loose(source, excluded);
+    if (Object.getOwnPropertySymbols) {
+        sourceKeys = Object.getOwnPropertySymbols(source);
+        for(i = 0; i < sourceKeys.length; i++){
+            key = sourceKeys[i];
+            if (excluded.indexOf(key) >= 0) continue;
+            if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+            target[key] = source[key];
+        }
+    }
+    return target;
+}
+function _object_without_properties_loose(source, excluded) {
+    if (source == null) return {};
+    var target = {}, sourceKeys = Object.getOwnPropertyNames(source), key, i;
+    for(i = 0; i < sourceKeys.length; i++){
+        key = sourceKeys[i];
+        if (excluded.indexOf(key) >= 0) continue;
+        if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+        target[key] = source[key];
+    }
+    return target;
+}
+
 
 
 
@@ -184,8 +372,11 @@ const normalizeColumnType = ({ dataType, columnType })=>{
     if (lower.startsWith('array')) {
         return source.replace(/^array/i, 'Array');
     }
-    if (lower.startsWith('json') || lower.startsWith('variant')) {
+    if (lower.startsWith('json')) {
         return 'JSON';
+    }
+    if (lower.startsWith('variant')) {
+        return 'Variant';
     }
     if (lower === 'bool' || lower === 'boolean' || lower.startsWith('tinyint(1)')) {
         return 'Bool';
@@ -438,6 +629,42 @@ function getFieldsService({ selectdbDS, database, table }) {
         }
     }));
 }
+function getApplicationValuesSQL({ database, table, timeField, startDate, endDate, attributeKey }) {
+    const resourceAttributes = (0,_utils_sql_filter__WEBPACK_IMPORTED_MODULE_5__/* .escapeSqlIdentifier */ .LT)('resource_attributes');
+    const applicationExpression = `CAST(${resourceAttributes}[${(0,_utils_sql_filter__WEBPACK_IMPORTED_MODULE_5__/* .quoteSqlLiteral */ .Ck)(attributeKey)}] AS STRING)`;
+    return `
+SELECT ${applicationExpression} AS application
+FROM ${(0,_utils_sql_filter__WEBPACK_IMPORTED_MODULE_5__/* .escapeSqlIdentifier */ .LT)(database)}.${(0,_utils_sql_filter__WEBPACK_IMPORTED_MODULE_5__/* .escapeSqlIdentifier */ .LT)(table)}
+WHERE ${(0,_utils_sql_filter__WEBPACK_IMPORTED_MODULE_5__/* .escapeSqlIdentifier */ .LT)(timeField)} BETWEEN ${(0,_utils_sql_filter__WEBPACK_IMPORTED_MODULE_5__/* .quoteSqlLiteral */ .Ck)(startDate)} AND ${(0,_utils_sql_filter__WEBPACK_IMPORTED_MODULE_5__/* .quoteSqlLiteral */ .Ck)(endDate)}
+  AND ${applicationExpression} IS NOT NULL
+  AND ${applicationExpression} != ''
+GROUP BY application
+ORDER BY application
+LIMIT 200;
+`;
+}
+function getApplicationValuesService(params) {
+    const { selectdbDS } = params, queryParams = _object_without_properties(params, [
+        "selectdbDS"
+    ]);
+    return (0,_components_with_error_handler_withErrorHandler__WEBPACK_IMPORTED_MODULE_3__/* .withErrorHandler */ .F)((0,_grafana_runtime__WEBPACK_IMPORTED_MODULE_1__.getBackendSrv)().fetch({
+        url: '/api/ds/query',
+        method: 'POST',
+        data: {
+            queries: [
+                {
+                    refId: 'getApplicationValues',
+                    datasource: {
+                        type: 'mysql',
+                        uid: selectdbDS.uid
+                    },
+                    rawSql: getApplicationValuesSQL(queryParams),
+                    format: 'table'
+                }
+            ]
+        }
+    }));
+}
 function getColumnFromFieldService({ selectdbDS, database, table }) {
 // return getBackendSrv().fetch({
 //     url: '/api/ds/query',
@@ -500,6 +727,7 @@ function getIndexesService({ selectdbDS, database, table }) {
 /* harmony export */   NJ: () => (/* binding */ afterTimeFieldPageSizeAtom),
 /* harmony export */   Ol: () => (/* binding */ pageSizeAtom),
 /* harmony export */   P8: () => (/* binding */ searchValueAtom),
+/* harmony export */   Ps: () => (/* binding */ discoverRowsExpandedAtom),
 /* harmony export */   SK: () => (/* binding */ databasesAtom),
 /* harmony export */   SW: () => (/* binding */ selectedDatasourceAtom),
 /* harmony export */   TY: () => (/* binding */ currentIndexAtom),
@@ -528,6 +756,7 @@ function getIndexesService({ selectdbDS, database, table }) {
 /* harmony export */   ps: () => (/* binding */ afterTimeAtom),
 /* harmony export */   q3: () => (/* binding */ tableDataAtom),
 /* harmony export */   qX: () => (/* binding */ beforeTimeFieldPageSizeAtom),
+/* harmony export */   tF: () => (/* binding */ timeZoneAtom),
 /* harmony export */   ui: () => (/* binding */ datasourcesAtom),
 /* harmony export */   uz: () => (/* binding */ beforeTimeAtom),
 /* harmony export */   wc: () => (/* binding */ surroundingDataFilterAtom)
@@ -536,17 +765,22 @@ function getIndexesService({ selectdbDS, database, table }) {
 /* harmony import */ var jotai__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4945);
 /* harmony import */ var jotai_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6303);
 /* harmony import */ var jotai_location__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7264);
-/* harmony import */ var _types_type__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7944);
-/* harmony import */ var _utils_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6700);
+/* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7781);
+/* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_grafana_data__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _types_type__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7944);
+/* harmony import */ var _utils_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6700);
+/* harmony import */ var _utils_time__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(1157);
 
 
 // import { focusAtom } from 'jotai-optics'
 
 
 
+
+
 const locationAtom = (0,jotai_location__WEBPACK_IMPORTED_MODULE_2__/* .atomWithLocation */ .N)();
 const dataFilterAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
-const discoverCurrentAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .atomWithStorage */ .tG)('discover-current', _utils_data__WEBPACK_IMPORTED_MODULE_4__/* .DISCOVER_DEFAULT_STATUS */ .lv);
+const discoverCurrentAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .atomWithStorage */ .tG)('discover-current', _utils_data__WEBPACK_IMPORTED_MODULE_5__/* .DISCOVER_DEFAULT_STATUS */ .lv);
 // databases
 const databasesAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const settingDatabasesAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
@@ -558,29 +792,30 @@ const currentDatabaseAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .selec
 const currentTableAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .atomWithStorage */ .tG)('discover-current-table', '');
 const currentClusterAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)('');
 const currentTimeFieldAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .selectAtom */ .mg)(discoverCurrentAtom, (current)=>current.timeField);
-const currentDateAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_4__/* .DISCOVER_SHORTCUTS */ .oU[3].range());
+const currentDateAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_5__/* .DISCOVER_SHORTCUTS */ .oU[3].range());
 const currentIndexAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const selectedIndexesAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const searchValueAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)('');
 const searchFocusAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(false);
-const activeShortcutAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_4__/* .DISCOVER_SHORTCUTS */ .oU[3]);
+const activeShortcutAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_5__/* .DISCOVER_SHORTCUTS */ .oU[3]);
 const dorisInfoAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)({});
 const disabledOptionsAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const selectedFieldsAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const tableFieldsAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .atomWithStorage */ .tG)('discover-table-fields', []);
+const discoverRowsExpandedAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .atomWithStorage */ .tG)('discover-rows-expanded', false);
 const timeFieldsAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .atomWithStorage */ .tG)('discover-time-fields', []);
 const tableDataAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const topDataAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const surroundingTableDataAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const tableDataChartsAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
-const intervalAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_types_type__WEBPACK_IMPORTED_MODULE_3__/* .IntervalEnum */ .B.Auto);
+const intervalAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_types_type__WEBPACK_IMPORTED_MODULE_4__/* .IntervalEnum */ .B.Auto);
 const tableTotalCountAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(0);
 const tableEChartsDataAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const tableTracesDataAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)();
 // Filter Content Atom
-const searchableAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_4__/* .SearchableEnum */ .Yp.ANY);
-const aggregatableAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_4__/* .AggregatableEnum */ .SY.ANY);
-const fieldTypeAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_4__/* .FieldTypeEnum */ .wI.ANY);
+const searchableAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_5__/* .SearchableEnum */ .Yp.ANY);
+const aggregatableAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_5__/* .AggregatableEnum */ .SY.ANY);
+const fieldTypeAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)(_utils_data__WEBPACK_IMPORTED_MODULE_5__/* .FieldTypeEnum */ .wI.ANY);
 const indexesAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const selectedRowAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)({});
 const tableFieldValuesAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
@@ -598,10 +833,11 @@ const surroundingTableFieldsAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom
 const surroundingSelectedFieldsAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const datasourcesAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)([]);
 const selectedDatasourceAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .atomWithStorage */ .tG)('discover-selected-datasource', undefined);
+const timeZoneAtom = (0,jotai_utils__WEBPACK_IMPORTED_MODULE_1__/* .atomWithStorage */ .tG)('discover-time-zone', (0,_utils_time__WEBPACK_IMPORTED_MODULE_6__/* .getGrafanaUserTimeZone */ .XP)());
 const timeRangeAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)({
-    from: _utils_data__WEBPACK_IMPORTED_MODULE_4__/* .DISCOVER_SHORTCUTS */ .oU[3].range()[0].toDate(),
-    to: _utils_data__WEBPACK_IMPORTED_MODULE_4__/* .DISCOVER_SHORTCUTS */ .oU[3].range()[1].toDate(),
-    raw: _utils_data__WEBPACK_IMPORTED_MODULE_4__/* .DISCOVER_SHORTCUTS */ .oU[3].raw
+    from: (0,_grafana_data__WEBPACK_IMPORTED_MODULE_3__.dateTime)(_utils_data__WEBPACK_IMPORTED_MODULE_5__/* .DISCOVER_SHORTCUTS */ .oU[3].range()[0].toDate()),
+    to: (0,_grafana_data__WEBPACK_IMPORTED_MODULE_3__.dateTime)(_utils_data__WEBPACK_IMPORTED_MODULE_5__/* .DISCOVER_SHORTCUTS */ .oU[3].range()[1].toDate()),
+    raw: _utils_data__WEBPACK_IMPORTED_MODULE_5__/* .DISCOVER_SHORTCUTS */ .oU[3].raw
 });
 const discoverLoadingAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU)({
     getTableData: false,
@@ -621,9 +857,10 @@ const discoverLoadingAtom = (0,jotai__WEBPACK_IMPORTED_MODULE_0__/* .atom */ .eU
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   T: () => (/* binding */ DEFAULT_LOGS_CONFIG),
-/* harmony export */   o: () => (/* binding */ mergeLogsConfig)
+/* harmony export */   TO: () => (/* binding */ DEFAULT_LOGS_CONFIG),
+/* harmony export */   oW: () => (/* binding */ mergeLogsConfig)
 /* harmony export */ });
+/* unused harmony export normalizeApplicationAttributeKey */
 function _define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -652,14 +889,44 @@ function _object_spread(target) {
     }
     return target;
 }
+function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+        var symbols = Object.getOwnPropertySymbols(object);
+        if (enumerableOnly) {
+            symbols = symbols.filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+            });
+        }
+        keys.push.apply(keys, symbols);
+    }
+    return keys;
+}
+function _object_spread_props(target, source) {
+    source = source != null ? source : {};
+    if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+        ownKeys(Object(source)).forEach(function(key) {
+            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+    }
+    return target;
+}
 const DEFAULT_LOGS_CONFIG = {
     datasource: 'doris',
     database: 'otel',
     logsTable: 'otel_logs',
-    targetTraceTable: 'otel_traces'
+    targetTraceTable: 'otel_traces',
+    applicationAttributeKey: 'app'
 };
+function normalizeApplicationAttributeKey(value) {
+    return (value === null || value === void 0 ? void 0 : value.trim()) || DEFAULT_LOGS_CONFIG.applicationAttributeKey || 'app';
+}
 function mergeLogsConfig(logsConfig) {
-    return _object_spread({}, DEFAULT_LOGS_CONFIG, logsConfig !== null && logsConfig !== void 0 ? logsConfig : {});
+    return _object_spread_props(_object_spread({}, DEFAULT_LOGS_CONFIG, logsConfig !== null && logsConfig !== void 0 ? logsConfig : {}), {
+        applicationAttributeKey: normalizeApplicationAttributeKey(logsConfig === null || logsConfig === void 0 ? void 0 : logsConfig.applicationAttributeKey)
+    });
 }
 
 
@@ -702,18 +969,21 @@ var IntervalEnum = /*#__PURE__*/ function(IntervalEnum) {
 /* harmony export */   WG: () => (/* binding */ encodeBase64),
 /* harmony export */   Wd: () => (/* binding */ getChartsData),
 /* harmony export */   Yp: () => (/* binding */ SearchableEnum),
+/* harmony export */   ZD: () => (/* binding */ escapeHtml),
 /* harmony export */   cE: () => (/* binding */ getIndexesStatement),
 /* harmony export */   hC: () => (/* binding */ getLatestTime),
 /* harmony export */   hO: () => (/* binding */ AGGREGATABLE),
 /* harmony export */   lv: () => (/* binding */ DISCOVER_DEFAULT_STATUS),
 /* harmony export */   ml: () => (/* binding */ convertColumnToRowViaFieldsType),
+/* harmony export */   mt: () => (/* binding */ parseJsonLikeValue),
 /* harmony export */   oU: () => (/* binding */ DISCOVER_SHORTCUTS),
-/* harmony export */   t9: () => (/* binding */ getFilterSQL),
+/* harmony export */   t9: () => (/* reexport safe */ _sql_filter__WEBPACK_IMPORTED_MODULE_7__.t9),
 /* harmony export */   tF: () => (/* binding */ isComplexType),
 /* harmony export */   wI: () => (/* binding */ FieldTypeEnum),
-/* harmony export */   we: () => (/* binding */ OPERATORS)
+/* harmony export */   we: () => (/* binding */ OPERATORS),
+/* harmony export */   xW: () => (/* binding */ formatFieldDisplayValue)
 /* harmony export */ });
-/* unused harmony exports SQL_OPERATORS, TIME_FIELD_TYPES, CAN_SEARCH_FIELD_TYPE, ENABLE_SEARCH_FIELD_TYPE, ParamsKeyEnum, addSqlFilter, SURROUNDING_LOGS_OPERATORS, PAGESIZE_OPTIONS, FIELD_TYPES, decodeBase64, formatDate, resetDate, getDateRange, QUERY_TRACE_FIELDS */
+/* unused harmony exports SQL_OPERATORS, TIME_FIELD_TYPES, CAN_SEARCH_FIELD_TYPE, ENABLE_SEARCH_FIELD_TYPE, isVariantType, ParamsKeyEnum, SURROUNDING_LOGS_OPERATORS, PAGESIZE_OPTIONS, FIELD_TYPES, decodeBase64, formatDate, resetDate, getDateRange, QUERY_TRACE_FIELDS */
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2351);
 /* harmony import */ var dayjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5285);
 /* harmony import */ var dayjs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dayjs__WEBPACK_IMPORTED_MODULE_1__);
@@ -722,14 +992,15 @@ var IntervalEnum = /*#__PURE__*/ function(IntervalEnum) {
 /* harmony import */ var lodash_es__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(1163);
 /* harmony import */ var nanoid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8987);
 /* harmony import */ var _types_type__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7944);
-/* harmony import */ var js_tokens__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(4132);
-/* harmony import */ var js_tokens__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(js_tokens__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var dayjs_plugin_localeData__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(892);
-/* harmony import */ var dayjs_plugin_localeData__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(dayjs_plugin_localeData__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(7781);
-/* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_grafana_data__WEBPACK_IMPORTED_MODULE_9__);
-/* harmony import */ var dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(4486);
-/* harmony import */ var dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _sql_filter__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(2721);
+/* harmony import */ var js_tokens__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(4132);
+/* harmony import */ var js_tokens__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(js_tokens__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var dayjs_plugin_localeData__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(892);
+/* harmony import */ var dayjs_plugin_localeData__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(dayjs_plugin_localeData__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(7781);
+/* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_grafana_data__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(4486);
+/* harmony import */ var dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_11__);
 
 
 
@@ -739,8 +1010,9 @@ var IntervalEnum = /*#__PURE__*/ function(IntervalEnum) {
 
 
 
-dayjs__WEBPACK_IMPORTED_MODULE_1___default().extend((dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_10___default()));
-dayjs__WEBPACK_IMPORTED_MODULE_1___default().extend((dayjs_plugin_localeData__WEBPACK_IMPORTED_MODULE_8___default()));
+
+dayjs__WEBPACK_IMPORTED_MODULE_1___default().extend((dayjs_plugin_utc__WEBPACK_IMPORTED_MODULE_11___default()));
+dayjs__WEBPACK_IMPORTED_MODULE_1___default().extend((dayjs_plugin_localeData__WEBPACK_IMPORTED_MODULE_9___default()));
 const OPERATORS = [
     '=',
     '!=',
@@ -800,6 +1072,64 @@ const getFieldType = (columnType)=>{
     const currentColumnType = FIELD_TYPES.find((item)=>item.value.some((val)=>columnType.toLocaleUpperCase().includes(val)));
     return currentColumnType === null || currentColumnType === void 0 ? void 0 : currentColumnType.key;
 };
+const isVariantType = (columnType)=>{
+    return String(columnType || '').toLocaleUpperCase().includes('VARIANT');
+};
+function parseJsonLikeValue(value) {
+    if (typeof value !== 'string') {
+        if (Array.isArray(value)) {
+            return value.map((item)=>parseJsonLikeValue(item));
+        }
+        if (value && typeof value === 'object') {
+            return Object.entries(value).reduce((result, [key, item])=>{
+                result[key] = parseJsonLikeValue(item);
+                return result;
+            }, {});
+        }
+        return value;
+    }
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return value;
+    }
+    let normalized = trimmed;
+    if (normalized.includes('\\"')) {
+        try {
+            normalized = JSON.parse(`"${normalized}"`);
+        } catch (unused) {
+            normalized = trimmed;
+        }
+    }
+    const looksJsonLike = normalized.startsWith('{') && normalized.endsWith('}') || normalized.startsWith('[') && normalized.endsWith(']') || normalized.startsWith('"') && normalized.endsWith('"');
+    if (!looksJsonLike) {
+        return value;
+    }
+    try {
+        return parseJsonLikeValue(JSON.parse(normalized));
+    } catch (unused) {
+        return value;
+    }
+}
+function formatFieldDisplayValue(value, mode = 'compact') {
+    if (value === null || value === undefined) {
+        return '-';
+    }
+    const parsedValue = parseJsonLikeValue(value);
+    if (parsedValue === null || parsedValue === undefined) {
+        return '-';
+    }
+    if (typeof parsedValue === 'object') {
+        try {
+            return JSON.stringify(parsedValue, null, mode === 'pretty' ? 2 : 0);
+        } catch (unused) {
+            return String(parsedValue);
+        }
+    }
+    return String(parsedValue);
+}
+function escapeHtml(value) {
+    return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 const DISCOVER_DEFAULT_STATUS = {
     catalog: 'internal',
     database: '',
@@ -853,6 +1183,7 @@ var FieldTypeEnum = /*#__PURE__*/ function(FieldTypeEnum) {
     FieldTypeEnum["STRING"] = "STRING";
     FieldTypeEnum["NUMBER"] = "NUMBER";
     FieldTypeEnum["DATE"] = "DATE";
+    FieldTypeEnum["VARIANT"] = "VARIANT";
     return FieldTypeEnum;
 }({});
 var ParamsKeyEnum = /*#__PURE__*/ function(ParamsKeyEnum) {
@@ -872,38 +1203,6 @@ var ParamsKeyEnum = /*#__PURE__*/ function(ParamsKeyEnum) {
     ParamsKeyEnum["selectedCluster"] = "selectedCluster";
     return ParamsKeyEnum;
 }({});
-function getFilterSQL({ fieldName, operator, value }) {
-    const valueString = value.map((e)=>{
-        if (typeof e === 'string') {
-            return `'${e}'`;
-        } else {
-            return e;
-        }
-    });
-    if (operator === '=' || operator === '!=' || operator === 'like' || operator === 'not like' || operator === 'match_all' || operator === 'match_any' || operator === 'match_phrase' || operator === 'match_phrase_prefix') {
-        return `\`${fieldName}\` ${operator} ${valueString[0]}`;
-    }
-    if (operator === 'is null' || operator === 'is not null') {
-        return `\`${fieldName}\` ${operator}`;
-    }
-    if (operator === 'between' || operator === 'not between') {
-        return `\`${fieldName}\` ${operator} ${valueString[0]} AND ${valueString[1]}`;
-    }
-    if (operator === 'in' || operator === 'not in') {
-        return `\`${fieldName}\` ${operator} (${valueString})`;
-    }
-    return '';
-}
-function addSqlFilter(sql, dataFilterValue) {
-    let result = sql;
-    if (!sql.toUpperCase().includes('WHERE')) {
-        result += ' WHERE';
-    } else {
-        result += ' AND';
-    }
-    result += ` (${getFilterSQL(dataFilterValue)})`;
-    return result;
-}
 function isWrappedInQuotes(inputString) {
     const pattern = /(["'])(.*?)\1/;
     return pattern.test(inputString);
@@ -1366,11 +1665,9 @@ function convertColumnToRow(frame) {
                 // 如果是时间字段，转换为 Dayjs 对象
                 row[fieldNames[j]] = formatTimestampToDateTime(row[fieldNames[j]], frame.schema.fields[j].precision || 3);
             }
-            if (frame.schema.fields[j].type === 'VARIANT') {
+            if (isVariantType(frame.schema.fields[j].type)) {
                 // 如果是 VARIANT 类型，转换为 JSON 对象
-                try {
-                    row[fieldNames[j]] = JSON.parse(row[fieldNames[j]]);
-                } catch (unused) {}
+                row[fieldNames[j]] = parseJsonLikeValue(row[fieldNames[j]]);
             }
         }
         rows.push(row);
@@ -1397,10 +1694,8 @@ function convertColumnToRowViaFieldsType(frame, fields) {
             }
             const currentFieldInfo = fields.filter((item)=>item.Field === frame.schema.fields[j].name)[0];
             // 如果是 VARIANT 类型，转换为 JSON 对象
-            if (currentFieldInfo && currentFieldInfo.Type.toUpperCase() === 'VARIANT') {
-                try {
-                    row[fieldNames[j]] = JSON.parse(row[fieldNames[j]]);
-                } catch (unused) {}
+            if (currentFieldInfo && isVariantType(currentFieldInfo.Type)) {
+                row[fieldNames[j]] = parseJsonLikeValue(row[fieldNames[j]]);
             }
         }
         rows.push(row);
@@ -1419,6 +1714,108 @@ function formatTimestampToDateTime(timestamp, precision = 3) {
     // 转换时间戳并格式化
     return dayjs__WEBPACK_IMPORTED_MODULE_1___default().utc(timestamp).locale(currentLocale).format(formatString);
 }
+function parseJsonIfString(item) {
+    if (typeof item !== 'string') {
+        return item;
+    }
+    const trimmed = item.trim();
+    if (!trimmed) {
+        return item;
+    }
+    try {
+        return JSON.parse(trimmed);
+    } catch (unused) {
+        return item;
+    }
+}
+function normalizeTraceTags(item) {
+    const parsed = parseJsonIfString(item);
+    if (Array.isArray(parsed)) {
+        return parsed.map((tag)=>{
+            if (tag && typeof tag === 'object' && 'key' in tag && 'value' in tag) {
+                return tag;
+            }
+            return {
+                key: String(tag),
+                value: ''
+            };
+        });
+    }
+    if (parsed && typeof parsed === 'object') {
+        return Object.entries(parsed).map(([key, value])=>({
+                key,
+                value
+            }));
+    }
+    return [];
+}
+function normalizeTraceLogTimestamp(timestamp) {
+    if (typeof timestamp === 'number' && Number.isFinite(timestamp)) {
+        return timestamp;
+    }
+    if (typeof timestamp === 'string') {
+        const numericTimestamp = Number(timestamp);
+        if (Number.isFinite(numericTimestamp)) {
+            return numericTimestamp;
+        }
+        const parsedTimestamp = dayjs__WEBPACK_IMPORTED_MODULE_1___default().utc(timestamp.replace(' ', 'T'));
+        if (parsedTimestamp.isValid()) {
+            return parsedTimestamp.valueOf();
+        }
+    }
+    return timestamp;
+}
+function normalizeTraceLogs(item) {
+    const parsed = parseJsonIfString(item);
+    if (!Array.isArray(parsed)) {
+        return [];
+    }
+    return parsed.map((event)=>{
+        var _ref, _parsedEvent_name, _ref1, _parsedEvent_attributes, _parsedEvent_timestamp;
+        const parsedEvent = parseJsonIfString(event);
+        if (!parsedEvent || typeof parsedEvent !== 'object') {
+            return {
+                timestamp: 0,
+                fields: [
+                    {
+                        key: 'event',
+                        value: parsedEvent
+                    }
+                ]
+            };
+        }
+        const existingFields = Array.isArray(parsedEvent.fields) ? normalizeTraceTags(parsedEvent.fields) : [];
+        const eventName = (_ref = (_parsedEvent_name = parsedEvent.name) !== null && _parsedEvent_name !== void 0 ? _parsedEvent_name : parsedEvent.event) !== null && _ref !== void 0 ? _ref : parsedEvent.event_name;
+        const eventAttributes = normalizeTraceTags((_ref1 = (_parsedEvent_attributes = parsedEvent.attributes) !== null && _parsedEvent_attributes !== void 0 ? _parsedEvent_attributes : parsedEvent.event_attributes) !== null && _ref1 !== void 0 ? _ref1 : {});
+        const extraFields = Object.entries(parsedEvent).filter(([key])=>![
+                'timestamp',
+                'time',
+                'name',
+                'event',
+                'event_name',
+                'attributes',
+                'event_attributes',
+                'fields'
+            ].includes(key)).map(([key, value])=>({
+                key,
+                value
+            }));
+        return {
+            timestamp: normalizeTraceLogTimestamp((_parsedEvent_timestamp = parsedEvent.timestamp) !== null && _parsedEvent_timestamp !== void 0 ? _parsedEvent_timestamp : parsedEvent.time),
+            fields: [
+                ...eventName !== undefined ? [
+                    {
+                        key: 'event',
+                        value: eventName
+                    }
+                ] : [],
+                ...existingFields,
+                ...eventAttributes,
+                ...extraFields
+            ]
+        };
+    });
+}
 function formatTracesResData(frame) {
     var _frame_schema, _frame_schema1;
     const { data } = frame;
@@ -1434,14 +1831,16 @@ function formatTracesResData(frame) {
             })),
         length: data.values[0].length
     };
-    try {
-        traceDataFrame.fields.forEach((f)=>{
-            if (f.name === 'serviceTags' || f.name === 'tags') {
-                f.type = _grafana_data__WEBPACK_IMPORTED_MODULE_9__.FieldType.other;
-                f.values = f.values.map((item)=>JSON.parse(item));
-            }
-        });
-    } catch (unused) {}
+    traceDataFrame.fields.forEach((f)=>{
+        if (f.name === 'serviceTags' || f.name === 'tags') {
+            f.type = _grafana_data__WEBPACK_IMPORTED_MODULE_10__.FieldType.other;
+            f.values = f.values.map((item)=>normalizeTraceTags(item));
+        }
+        if (f.name === 'logs') {
+            f.type = _grafana_data__WEBPACK_IMPORTED_MODULE_10__.FieldType.other;
+            f.values = f.values.map((item)=>normalizeTraceLogs(item));
+        }
+    });
     return traceDataFrame;
 }
 function getSearchTableData(tokenizeFields, tableResult) {
@@ -1483,12 +1882,8 @@ function generateHighlightedResults(data, result) {
     const _sourceResult = result.map((item)=>{
         let itemSource = '';
         for(const key in item){
-            let highlightValue = item[key];
-            let itemValue = item[key];
-            if (typeof highlightValue === 'object') {
-                highlightValue = JSON.stringify(highlightValue);
-                itemValue = JSON.stringify(itemValue);
-            }
+            let highlightValue = formatFieldDisplayValue(item[key], 'compact');
+            let itemValue = highlightValue;
             if (keyword && (searchField(searchTableData, key) || luceneField && key === luceneField)) {
                 const strValue = typeof itemValue === 'string' ? itemValue : itemValue + '';
                 if (isWrappedInQuotes(keyword)) {
@@ -1501,7 +1896,7 @@ function generateHighlightedResults(data, result) {
                         highlightValue = strValue;
                     }
                 } else {
-                    const tokenizedAns = Array.from(js_tokens__WEBPACK_IMPORTED_MODULE_7___default()(strValue)).map((item)=>item.value);
+                    const tokenizedAns = Array.from(js_tokens__WEBPACK_IMPORTED_MODULE_8___default()(strValue)).map((item)=>item.value);
                     let ans = [];
                     if (tokenizedAns.includes(keyword)) {
                         ans = tokenizedAns;
@@ -1534,10 +1929,12 @@ function generateHighlightedResults(data, result) {
                 highlightValue = `<a 
                 href="javascript:void(0)" 
                 class="trace-link" 
-                data-trace-id="${traceId}"
-            >${content}</a>`;
+                data-trace-id="${escapeHtml(traceId)}"
+            >${escapeHtml(content)}</a>`;
+            } else {
+                highlightValue = escapeHtml(highlightValue);
             }
-            itemSource += `<span class="field-key">${key}:</span>${highlightValue} `;
+            itemSource += `<span class="field-key">${escapeHtml(key)}:</span>${highlightValue} `;
         }
         return {
             _original: item,
@@ -1580,7 +1977,159 @@ function toError(value) {
 }
 
 
+/***/ },
+
+/***/ 2721
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Ck: () => (/* binding */ quoteSqlLiteral),
+/* harmony export */   LT: () => (/* binding */ escapeSqlIdentifier),
+/* harmony export */   QI: () => (/* binding */ addSqlFilter),
+/* harmony export */   t9: () => (/* binding */ getFilterSQL)
+/* harmony export */ });
+/* unused harmony exports escapeSqlLiteral, transformFieldPath */
+function escapeSqlIdentifier(identifier) {
+    return `\`${String(identifier).replace(/`/g, '``')}\``;
+}
+function escapeSqlLiteral(value) {
+    return String(value).replace(/\\/g, '\\\\').replace(/'/g, "''");
+}
+function quoteSqlLiteral(value) {
+    return `'${escapeSqlLiteral(value)}'`;
+}
+function transformFieldPath(fieldPath) {
+    const parts = fieldPath.split('.');
+    const root = parts.shift() || '';
+    return escapeSqlIdentifier(root) + parts.map((part)=>`[${quoteSqlLiteral(part)}]`).join('');
+}
+function getFilterFieldReference({ fieldName, variantKey }) {
+    if (variantKey !== undefined) {
+        return `${escapeSqlIdentifier(fieldName)}[${quoteSqlLiteral(variantKey)}]`;
+    }
+    return transformFieldPath(fieldName);
+}
+function getFilterValue(value) {
+    return typeof value === 'string' ? quoteSqlLiteral(value) : String(value);
+}
+function getFilterSQL(filter) {
+    const { operator, value } = filter;
+    const fieldReference = getFilterFieldReference(filter);
+    const values = value.map(getFilterValue);
+    if (operator === '=' || operator === '!=' || operator === 'like' || operator === 'not like' || operator === 'match_all' || operator === 'match_any' || operator === 'match_phrase' || operator === 'match_phrase_prefix') {
+        return `${fieldReference} ${operator} ${values[0]}`;
+    }
+    if (operator === 'is null' || operator === 'is not null') {
+        return `${fieldReference} ${operator}`;
+    }
+    if (operator === 'between' || operator === 'not between') {
+        return `${fieldReference} ${operator} ${values[0]} AND ${values[1]}`;
+    }
+    if (operator === 'in' || operator === 'not in') {
+        return `${fieldReference} ${operator} (${values.join(', ')})`;
+    }
+    return '';
+}
+function addSqlFilter(sql, dataFilterValue) {
+    const conjunction = sql.toUpperCase().includes('WHERE') ? ' AND' : ' WHERE';
+    return `${sql}${conjunction} (${getFilterSQL(dataFilterValue)})`;
+}
+
+
+/***/ },
+
+/***/ 1157
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   F9: () => (/* binding */ normalizeTimeZone),
+/* harmony export */   K$: () => (/* binding */ toDayjsRange),
+/* harmony export */   Oh: () => (/* binding */ formatTimeInZone),
+/* harmony export */   XP: () => (/* binding */ getGrafanaUserTimeZone),
+/* harmony export */   kh: () => (/* binding */ buildAbsoluteTimeRange),
+/* harmony export */   mL: () => (/* binding */ toEpochSeconds),
+/* harmony export */   mk: () => (/* binding */ parseTimeInZone),
+/* harmony export */   n: () => (/* binding */ buildRelativeTimeRange)
+/* harmony export */ });
+/* unused harmony export DEFAULT_TIME_ZONE */
+/* harmony import */ var _grafana_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8531);
+/* harmony import */ var _grafana_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_grafana_runtime__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7781);
+/* harmony import */ var _grafana_data__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_grafana_data__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var dayjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5285);
+/* harmony import */ var dayjs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(dayjs__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2351);
+
+
+
+
+const DEFAULT_TIME_ZONE = 'browser';
+function getGrafanaUserTimeZone() {
+    var _config_bootData_user, _config_bootData;
+    return ((_config_bootData = _grafana_runtime__WEBPACK_IMPORTED_MODULE_0__.config.bootData) === null || _config_bootData === void 0 ? void 0 : (_config_bootData_user = _config_bootData.user) === null || _config_bootData_user === void 0 ? void 0 : _config_bootData_user.timezone) || DEFAULT_TIME_ZONE;
+}
+function normalizeTimeZone(timeZone) {
+    const normalized = timeZone === null || timeZone === void 0 ? void 0 : timeZone.trim();
+    return normalized ? normalized : undefined;
+}
+function parseTimeInZone(value, timeZone = getGrafanaUserTimeZone()) {
+    if (!value) {
+        return undefined;
+    }
+    const parsedDate = (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTimeParse)(value, {
+        timeZone,
+        format: _constants__WEBPACK_IMPORTED_MODULE_3__/* .FORMAT_DATE */ .fU
+    });
+    return (parsedDate === null || parsedDate === void 0 ? void 0 : parsedDate.isValid()) ? dayjs__WEBPACK_IMPORTED_MODULE_2___default()(parsedDate.toDate()) : undefined;
+}
+function formatTimeInZone(value, timeZone) {
+    return (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTimeFormat)((0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTime)(value.toDate()), {
+        timeZone,
+        format: _constants__WEBPACK_IMPORTED_MODULE_3__/* .FORMAT_DATE */ .fU
+    });
+}
+function toDayjsRange(timeRange) {
+    return [
+        dayjs__WEBPACK_IMPORTED_MODULE_2___default()(timeRange.from.toDate()),
+        dayjs__WEBPACK_IMPORTED_MODULE_2___default()(timeRange.to.toDate())
+    ];
+}
+function buildRelativeTimeRange(rawFrom, rawTo, timeZone) {
+    return _grafana_data__WEBPACK_IMPORTED_MODULE_1__.rangeUtil.convertRawToRange({
+        from: rawFrom,
+        to: rawTo
+    }, timeZone);
+}
+function buildAbsoluteTimeRange(start, end) {
+    return {
+        from: (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTime)(start.toDate()),
+        to: (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTime)(end.toDate()),
+        raw: {
+            from: (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTime)(start.toDate()),
+            to: (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTime)(end.toDate())
+        }
+    };
+}
+/**
+ * 把时间点转成 Unix 秒。
+ *
+ * 时间范围过滤不要再拼 'YYYY-MM-DD HH:mm:ss' 裸串:那种写法把时区解释权
+ * 交给了服务端 —— Doris 会按自己的 time_zone 解释这个字符串。只要浏览器
+ * (或用户选的时区)与 Doris 的 time_zone 不一致,查询窗口就整体平移,
+ * 页面查不到最新数据,而且不报错。
+ *
+ * 换成 epoch 之后,时间点是绝对的,与两端时区设置无关。
+ * 配合 SQL 里的 FROM_UNIXTIME() 使用。
+ */ function toEpochSeconds(value) {
+    if (!value) {
+        return undefined;
+    }
+    const ms = value.valueOf();
+    return Number.isFinite(ms) ? Math.floor(ms / 1000) : undefined;
+}
+
+
 /***/ }
 
 }]);
-//# sourceMappingURL=131.js.map?_cache=2e7f1aae0c477f38b4b8
+//# sourceMappingURL=590.js.map?_cache=83c08e8bb9d39134ef57
