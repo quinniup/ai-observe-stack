@@ -138,10 +138,19 @@ function TraceDetail(props) {
     const [traceData, setTraceData] = (0,react/* useAtom */.fp)(discover/* tableTracesDataAtom */.UB);
     const selectedRow = (0,react/* useAtomValue */.md)(discover/* selectedRowAtom */.nn);
     const selectdbDS = (0,react/* useAtomValue */.md)(discover/* selectedDatasourceAtom */.SW);
-    const traceTable = (props === null || props === void 0 ? void 0 : props.traceTable) || currentTable || 'otel_traces';
     const [loading, setLoading] = external_react_default().useState(false);
     const context = (0,data_.usePluginContext)();
     const logsConfig = (0,plugin_settings/* mergeLogsConfig */.oW)((_context_meta_jsonData = context.meta.jsonData) === null || _context_meta_jsonData === void 0 ? void 0 : _context_meta_jsonData.logsConfig);
+    // 表的选择顺序:显式传入 > 插件配置的 targetTraceTable > 兜底常量。
+    //
+    // 不能把 currentTable(currentTraceTableAtom)排在配置前面:那个 atom 是
+    // atomWithStorage,值持久化在浏览器 localStorage 里。用户先逛过 Discover
+    // (那边选的是日志表 app_log)之后再点 trace_id,这里就会拿到 app_log,
+    // 于是拼出 SELECT span_id ... FROM app_log,Doris 报
+    // "Unknown column 'span_id'",前端只显示 "db query error" / "Failed to
+    // request trace" —— 看不出真正原因,而且清缓存就好、换台机器又复现。
+    const configuredTraceTable = logsConfig.targetTraceTable;
+    const traceTable = (props === null || props === void 0 ? void 0 : props.traceTable) || configuredTraceTable || currentTable || 'otel_traces';
     const { open, traceId } = props;
     const createSpanLink = external_react_default().useCallback((span)=>{
         var _span_process;
@@ -1397,4 +1406,4 @@ function trimSpacesAroundEquals(str) {
 /***/ }
 
 }]);
-//# sourceMappingURL=625.js.map?_cache=ea9951b34e28165a841a
+//# sourceMappingURL=625.js.map?_cache=aa8a17f38872d9188dc5
