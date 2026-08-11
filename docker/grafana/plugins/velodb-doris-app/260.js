@@ -681,6 +681,8 @@ var plugin_settings = __webpack_require__(325);
 var utils_data = __webpack_require__(6700);
 // EXTERNAL MODULE: ./constants.ts + 1 modules
 var constants = __webpack_require__(2351);
+// EXTERNAL MODULE: ./utils/time.ts
+var time = __webpack_require__(1157);
 // EXTERNAL MODULE: ./services/metaservice.ts
 var metaservice = __webpack_require__(8161);
 // EXTERNAL MODULE: ./utils/errors.ts
@@ -770,6 +772,7 @@ function _object_spread_props(target, source) {
     }
     return target;
 }
+
 
 
 
@@ -889,6 +892,7 @@ function TracesHeader() {
     const searchFocus = (0,react/* useAtomValue */.md)(discover/* searchFocusAtom */.MM);
     const [selectedDatasource, setSelectedDatasource] = (0,react/* useAtom */.fp)(discover/* selectedDatasourceAtom */.SW);
     const [timeRange, setTimeRange] = (0,react/* useAtom */.fp)(discover/* timeRangeAtom */.U9);
+    const [timeZone, setTimeZone] = (0,react/* useAtom */.fp)(discover/* timeZoneAtom */.tF);
     const [currentTable, setCurrentTable] = (0,react/* useAtom */.fp)(store_traces/* currentTraceTableAtom */.AZ);
     const [databases, setDatabases] = (0,react/* useAtom */.fp)(discover/* databasesAtom */.SK);
     const [tables, setTables] = (0,react/* useAtom */.fp)(discover/* tablesAtom */.b9);
@@ -1387,18 +1391,26 @@ function TracesHeader() {
                 }
             });
             updateShareParams({
-                startTime: hasRelativeRaw ? undefined : start.format(constants/* FORMAT_DATE */.fU),
-                endTime: hasRelativeRaw ? undefined : end.format(constants/* FORMAT_DATE */.fU),
+                startTime: hasRelativeRaw ? undefined : (0,time/* formatTimeInZone */.Oh)(start, timeZone),
+                endTime: hasRelativeRaw ? undefined : (0,time/* formatTimeInZone */.Oh)(end, timeZone),
                 timeRawFrom: hasRelativeRaw ? rawFrom : undefined,
                 timeRawTo: hasRelativeRaw ? rawTo : undefined
             });
         },
+        onChangeTimeZone: (nextTimeZone)=>{
+            setTimeZone(nextTimeZone);
+            updateShareParams({
+                timeZone: nextTimeZone
+            });
+        },
+        timeZone: timeZone,
+        // 同 discover-header:TimeRangeInput 默认 hideTimeZone=true,
+        // 不显式传 false 的话下拉里那行时区切换不渲染。
+        hideTimeZone: false,
         value: timeRange
     }))));
 }
 
-// EXTERNAL MODULE: ./utils/time.ts
-var time = __webpack_require__(1157);
 // EXTERNAL MODULE: ./services/traces.ts + 1 modules
 var services_traces = __webpack_require__(3764);
 ;// ../node_modules/lucide-react/dist/esm/icons/x.js
@@ -1953,4 +1965,4 @@ function PageTrace() {
 /***/ }
 
 }]);
-//# sourceMappingURL=260.js.map?_cache=88eb325c74d54d799e5a
+//# sourceMappingURL=260.js.map?_cache=ec2d90762faa2362d65c

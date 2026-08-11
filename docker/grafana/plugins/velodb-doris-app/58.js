@@ -6725,6 +6725,10 @@ function DiscoverHeader(props) {
             });
         },
         timeZone: timeZone,
+        // TimeRangeInput 默认 hideTimeZone=true,不显式传 false 的话
+        // 下拉面板里那行时区切换根本不渲染,onChangeTimeZone 永远不会
+        // 被触发 —— 用户只能看到时区、改不了。
+        hideTimeZone: false,
         value: timeRange
     }))), /*#__PURE__*/ external_react_default().createElement(ui_.Field, {
         label: ""
@@ -7762,4 +7766,4 @@ function PageDiscover() {
 /***/ }
 
 }]);
-//# sourceMappingURL=58.js.map?_cache=e4dc5090cefc7c1f3307
+//# sourceMappingURL=58.js.map?_cache=ace77df711a61d190354
