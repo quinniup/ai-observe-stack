@@ -543,11 +543,16 @@ function getQueryTableTraceSQL(params) {
       duration / 1000 AS duration,
 
       CAST(span_attributes AS TEXT) AS tags,
+      -- CAST(... AS TEXT),不是 AS JSON:Doris(实测 4.0.7)不支持把
+      -- ARRAY<STRUCT<...>> 转成 JSON,会直接报
+      --   can not cast from origin type ARRAY<STRUCT<...>> to target type=JSON
+      -- 整条查询失败,前端只显示 "db query error"。
+      -- CAST 成 TEXT 的输出本身就是合法 JSON 字符串,前端解析结果一致。
       CAST(ARRAY_MAP(e -> NAMED_STRUCT(
         'timestamp', CAST(UNIX_TIMESTAMP(STRUCT_ELEMENT(e, 'timestamp')) * 1000 AS BIGINT),
         'name', STRUCT_ELEMENT(e, 'name'),
         'attributes', STRUCT_ELEMENT(e, 'attributes')
-      ), events) AS JSON) AS logs,
+      ), events) AS TEXT) AS logs,
 
       span_kind AS kind,
       CASE
@@ -1406,4 +1411,4 @@ function trimSpacesAroundEquals(str) {
 /***/ }
 
 }]);
-//# sourceMappingURL=625.js.map?_cache=aa8a17f38872d9188dc5
+//# sourceMappingURL=625.js.map?_cache=6118c60bf3a6d7f91352
