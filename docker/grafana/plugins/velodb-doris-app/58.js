@@ -7120,7 +7120,10 @@ function useDiscoverData_object_spread_props(target, source) {
 
 
 
+
+
 function useDiscoverData() {
+    var _pluginContext_meta_jsonData, _pluginContext_meta;
     const didRunPageEffect = (0,external_react_.useRef)(false);
     const didRunAutoRefreshEffect = (0,external_react_.useRef)(false);
     const [page, setPage] = (0,react/* useAtom */.fp)(discover/* pageAtom */.fs);
@@ -7141,6 +7144,8 @@ function useDiscoverData() {
     const currentDatabase = (0,react/* useAtomValue */.md)(discover/* currentDatabaseAtom */.Cf);
     const currentDate = (0,react/* useAtomValue */.md)(discover/* currentDateAtom */.Zb);
     const timeZone = (0,react/* useAtomValue */.md)(discover/* timeZoneAtom */.tF);
+    const pluginContext = (0,data_.usePluginContext)();
+    const logsConfig = (0,plugin_settings/* mergeLogsConfig */.oW)(pluginContext === null || pluginContext === void 0 ? void 0 : (_pluginContext_meta = pluginContext.meta) === null || _pluginContext_meta === void 0 ? void 0 : (_pluginContext_meta_jsonData = _pluginContext_meta.jsonData) === null || _pluginContext_meta_jsonData === void 0 ? void 0 : _pluginContext_meta_jsonData.logsConfig);
     const setTableTotalCount = (0,react/* useSetAtom */.Xr)(discover/* tableTotalCountAtom */.HC);
     const setTraceData = (0,react/* useSetAtom */.Xr)(discover/* tableTracesDataAtom */.UB);
     const [loading, setLoading] = (0,react/* useAtom */.fp)(discover/* discoverLoadingAtom */.jU);
@@ -7546,7 +7551,15 @@ function useDiscoverData() {
         const payload = {
             catalog: currentCatalog,
             database: currentDatabase,
-            table: table || currentTable || 'otel_traces',
+            // trace 查询绝不能回落到 currentTable —— 在 Discover 页那是日志表
+            // (app_log),拿它查 span_id/parent_span_id 会直接报
+            // "Unknown column 'span_id'",前端只显示 "Failed to request
+            // trace",完全看不出原因。
+            //
+            // 调用方在当前库与插件配置的 database 不一致时(例如配置写的是
+            // otel_prod、用户在看 otel_devtest)不会传 table,所以这里必须
+            // 自己兜住:优先配置的 targetTraceTable,再退到常量。
+            table: table || logsConfig.targetTraceTable || 'otel_traces',
             timeField: currentTimeField,
             startDate: formatCurrentTime(currentDate[0]),
             endDate: formatCurrentTime(currentDate[1]),
@@ -7766,4 +7779,4 @@ function PageDiscover() {
 /***/ }
 
 }]);
-//# sourceMappingURL=58.js.map?_cache=ace77df711a61d190354
+//# sourceMappingURL=58.js.map?_cache=8a0fbe06c238cc81d6ab
