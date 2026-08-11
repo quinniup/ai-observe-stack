@@ -1361,6 +1361,8 @@ var dayjs_min_default = /*#__PURE__*/__webpack_require__.n(dayjs_min);
 var type = __webpack_require__(7944);
 // EXTERNAL MODULE: ./constants.ts + 1 modules
 var constants = __webpack_require__(2351);
+// EXTERNAL MODULE: ./utils/time.ts
+var utils_time = __webpack_require__(1157);
 ;// ./components/discover-histogram/index.tsx
 function discover_histogram_define_property(obj, key, value) {
     if (key in obj) {
@@ -1424,10 +1426,11 @@ function discover_histogram_object_spread_props(target, source) {
 
 
 
+
 function DiscoverHistogram() {
-    var _currentDate_, _currentDate_1;
     const theme = (0,ui_.useTheme2)().isDark ? 'dark' : 'light';
     const [currentDate, setCurrentDate] = (0,react/* useAtom */.fp)(discover/* currentDateAtom */.Zb);
+    const timeZone = (0,react/* useAtomValue */.md)(discover/* timeZoneAtom */.tF);
     const ReactEChartsInstance = (0,external_react_.useRef)(null);
     const [discoverCurrent, setDiscoverCurrent] = (0,react/* useAtom */.fp)(discover/* discoverCurrentAtom */.WN);
     const setActiveItem = (0,react/* useSetAtom */.Xr)(discover/* activeShortcutAtom */.m_);
@@ -1483,7 +1486,9 @@ function DiscoverHistogram() {
         ],
         xAxis: {
             type: 'category',
-            data: tableDataCharts.map((e)=>e['TT']),
+            // 桶的时间戳来自 Doris(UTC 裸串),按所选时区渲染,
+            // 否则 X 轴和时间选择器上标的时区差几个小时。
+            data: tableDataCharts.map((e)=>(0,utils_time/* renderTimeInZone */.FA)(e['TT'], timeZone)),
             axisLabel: {
                 fontSize: '12px',
                 fontStyle: 'normal',
@@ -1569,6 +1574,7 @@ function DiscoverHistogram() {
         const chart = ReactEChartsInstance.current;
         if (chart && tableDataCharts.length > 0) {
             const handler = ({ areas })=>{
+                var _parseTimeInZone, _parseTimeInZone1;
                 if (!areas.length) {
                     return;
                 }
@@ -1577,23 +1583,27 @@ function DiscoverHistogram() {
                 setActiveItem(undefined);
                 const [startIndex, endIndex] = areas[0].coordRange;
                 const timeInterval = interval === type/* IntervalEnum */.B.Auto ? (0,constants/* getAutoInterval */.Vy)(currentDate).interval_unit : interval;
-                const chartsEndDate = dayjs_min_default()(new Date(tableDataCharts[endIndex]['TT'])).add(interval_value, timeInterval);
+                // 桶的 TT 是 Doris 返回的裸串(UTC),必须按 UTC 解析。
+                // 用 dayjs() 直接解析会当成浏览器本地时区,刷选后的范围会整体
+                // 平移,查出来的不是你框的那一段。
+                const chartsStartDate = (_parseTimeInZone = (0,utils_time/* parseTimeInZone */.mk)(tableDataCharts[startIndex]['TT'], 'utc')) !== null && _parseTimeInZone !== void 0 ? _parseTimeInZone : dayjs_min_default()(tableDataCharts[startIndex]['TT']);
+                const chartsEndDate = ((_parseTimeInZone1 = (0,utils_time/* parseTimeInZone */.mk)(tableDataCharts[endIndex]['TT'], 'utc')) !== null && _parseTimeInZone1 !== void 0 ? _parseTimeInZone1 : dayjs_min_default()(tableDataCharts[endIndex]['TT'])).add(interval_value, timeInterval);
                 setDiscoverCurrent(discover_histogram_object_spread_props(discover_histogram_object_spread({}, discoverCurrent), {
                     date: [
-                        dayjs_min_default()(tableDataCharts[startIndex]['TT']),
+                        chartsStartDate,
                         chartsEndDate
                     ]
                 }));
                 setCurrentDate([
-                    dayjs_min_default()(tableDataCharts[startIndex]['TT']),
+                    chartsStartDate,
                     chartsEndDate
                 ]);
                 const timeRange = {
-                    from: dayjs_min_default()(tableDataCharts[startIndex]['TT']).format(constants/* FORMAT_DATE */.fU),
-                    to: chartsEndDate.format(constants/* FORMAT_DATE */.fU),
+                    from: (0,utils_time/* formatTimeInZone */.Oh)(chartsStartDate, timeZone),
+                    to: (0,utils_time/* formatTimeInZone */.Oh)(chartsEndDate, timeZone),
                     raw: {
-                        from: dayjs_min_default()(tableDataCharts[startIndex]['TT']).format(constants/* FORMAT_DATE */.fU),
-                        to: chartsEndDate.format(constants/* FORMAT_DATE */.fU)
+                        from: (0,utils_time/* formatTimeInZone */.Oh)(chartsStartDate, timeZone),
+                        to: (0,utils_time/* formatTimeInZone */.Oh)(chartsEndDate, timeZone)
                     }
                 };
                 setTimeRange(timeRange);
@@ -1644,7 +1654,7 @@ function DiscoverHistogram() {
                         font-size: 14px;
                         color: rgb(190,190,193)
                     `
-    }, currentDate && `${(_currentDate_ = currentDate[0]) === null || _currentDate_ === void 0 ? void 0 : _currentDate_.format(constants/* FORMAT_DATE */.fU)} ~ ${(_currentDate_1 = currentDate[1]) === null || _currentDate_1 === void 0 ? void 0 : _currentDate_1.format(constants/* FORMAT_DATE */.fU)} `), /*#__PURE__*/ external_react_default().createElement("div", {
+    }, currentDate && `${currentDate[0] ? (0,utils_time/* formatTimeInZone */.Oh)(currentDate[0], timeZone) : ''} ~ ${currentDate[1] ? (0,utils_time/* formatTimeInZone */.Oh)(currentDate[1], timeZone) : ''} `), /*#__PURE__*/ external_react_default().createElement("div", {
         className: (0,css_.css)`
                         width: 160px;
                     `
@@ -3671,6 +3681,7 @@ function discover_content_object_without_properties_loose(source, excluded) {
 
 
 
+
 function DiscoverContent({ fetchNextPage, getTraceData }) {
     const theme = (0,ui_.useTheme2)();
     const [fields, setFields] = (0,external_react_.useState)([]);
@@ -3679,6 +3690,7 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
     const [selectedFields, setSelectedFields] = (0,react/* useAtom */.fp)(discover/* selectedFieldsAtom */.Wg);
     const hasSelectedFields = selectedFields.length > 0;
     const currentTimeField = (0,react/* useAtomValue */.md)(discover/* currentTimeFieldAtom */.CA);
+    const timeZone = (0,react/* useAtomValue */.md)(discover/* timeZoneAtom */.tF);
     // const [surroundingOpen, setSurroundingOpen] = useState(false);
     const [selectedRow, setSelectedRow] = (0,react/* useAtom */.fp)(discover/* selectedRowAtom */.nn);
     const setSurroundingTableData = (0,react/* useSetAtom */.Xr)(discover/* surroundingTableDataAtom */.mj);
@@ -3914,14 +3926,11 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
                     // If this field is a valid time field type, try to format it
                     try {
                         if (fieldInfo && (0,utils_data/* isValidTimeFieldType */.Q3)(String(fieldInfo.Type).toUpperCase())) {
-                            // if numeric timestamp, convert
-                            const num = Number(fieldValue);
-                            if (!Number.isNaN(num)) {
-                                timeField = (0,utils_data/* formatTimestampToDateTime */.My)(num);
-                            } else {
-                                // otherwise keep raw string (or attempt Date parse)
-                                timeField = String(fieldValue || '');
-                            }
+                            // 按时区选择器选的时区渲染。Doris 里是不带时区的
+                            // DATETIME(按 Doris 的 time_zone,我们是 UTC),
+                            // 不换算的话这一列显示的是 UTC 时刻,和时间选择器
+                            // 上标的时区对不上。
+                            timeField = (0,utils_time/* renderTimeInZone */.FA)(fieldValue, timeZone);
                         }
                     } catch (e) {
                         // fallback to raw
@@ -5747,8 +5756,6 @@ function Lucene({ onQuerying }) {
 
 // EXTERNAL MODULE: ./hooks/useDatasourcePermissions.ts
 var useDatasourcePermissions = __webpack_require__(9693);
-// EXTERNAL MODULE: ./utils/time.ts
-var utils_time = __webpack_require__(1157);
 ;// ./components/discover-header/application-filter.ts
 const APPLICATION_FILTER_ID = 'application-filter';
 function getConfiguredApplicationAttributeKey(value) {
@@ -7779,4 +7786,4 @@ function PageDiscover() {
 /***/ }
 
 }]);
-//# sourceMappingURL=58.js.map?_cache=8a0fbe06c238cc81d6ab
+//# sourceMappingURL=58.js.map?_cache=07c8483087d3f637cc12

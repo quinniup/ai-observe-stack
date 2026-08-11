@@ -50,6 +50,7 @@ __webpack_require__.d(__webpack_exports__, {
   UB: () => (/* binding */ DEFAULT_OPERATION),
   aR: () => (/* binding */ DEFAULT_SERVICE),
   fU: () => (/* binding */ FORMAT_DATE),
+  uU: () => (/* binding */ FORMAT_DATE_MS),
   Bg: () => (/* binding */ IntervalEnum),
   Gy: () => (/* binding */ PLUGIN_BASE_URL),
   bw: () => (/* binding */ ROUTES),
@@ -75,6 +76,8 @@ var ROUTES = /*#__PURE__*/ function(ROUTES) {
     return ROUTES;
 }({});
 const FORMAT_DATE = 'YYYY-MM-DD HH:mm:ss';
+// Doris 的 DATETIME(3) 带毫秒,展示时保留 —— 日志排查经常要看到毫秒。
+const FORMAT_DATE_MS = 'YYYY-MM-DD HH:mm:ss.SSS';
 var IntervalEnum = /*#__PURE__*/ function(IntervalEnum) {
     IntervalEnum["Auto"] = "auto";
     IntervalEnum["Day"] = "day";
@@ -314,4 +317,4 @@ function translationDateIntervalType(type) {
 /***/ }
 
 }]);
-//# sourceMappingURL=462.js.map?_cache=53593b9d6f725b1fe0da
+//# sourceMappingURL=462.js.map?_cache=aa2a90d6801217eb7b9e

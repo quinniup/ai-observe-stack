@@ -2043,6 +2043,7 @@ function addSqlFilter(sql, dataFilterValue) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   F9: () => (/* binding */ normalizeTimeZone),
+/* harmony export */   FA: () => (/* binding */ renderTimeInZone),
 /* harmony export */   K$: () => (/* binding */ toDayjsRange),
 /* harmony export */   Oh: () => (/* binding */ formatTimeInZone),
 /* harmony export */   XP: () => (/* binding */ getGrafanaUserTimeZone),
@@ -2127,9 +2128,43 @@ function buildAbsoluteTimeRange(start, end) {
     const ms = value.valueOf();
     return Number.isFinite(ms) ? Math.floor(ms / 1000) : undefined;
 }
+/**
+ * 把 Doris 返回的时间值按指定时区渲染出来。
+ *
+ * Doris 里存的是不带时区的 DATETIME,取回来是 'YYYY-MM-DD HH:mm:ss.SSS'
+ * 这样的裸串,按 Doris 自己的 time_zone 记录(我们是 UTC)。直接显示的话
+ * 用户看到的是 UTC 时刻,而时间选择器上写的是他选的时区(比如 CST),
+ * 两边对不上 —— 图表 X 轴、表格时间列都会比预期差几个小时。
+ *
+ * 所以显示前要把它当作 sourceTimeZone 的时刻解析,再换算到 timeZone。
+ *
+ * 数字(epoch 毫秒)直接按 timeZone 渲染,不需要 sourceTimeZone。
+ */ function renderTimeInZone(value, timeZone, sourceTimeZone = 'utc') {
+    if (value === null || value === undefined || value === '') {
+        return '';
+    }
+    if (typeof value === 'number' || typeof value === 'string' && value !== '' && !Number.isNaN(Number(value))) {
+        return (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTimeFormat)((0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTime)(Number(value)), {
+            timeZone,
+            format: _constants__WEBPACK_IMPORTED_MODULE_3__/* .FORMAT_DATE_MS */ .uU
+        });
+    }
+    const raw = String(value);
+    const parsed = (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTimeParse)(raw, {
+        timeZone: sourceTimeZone,
+        format: _constants__WEBPACK_IMPORTED_MODULE_3__/* .FORMAT_DATE_MS */ .uU
+    });
+    if (!(parsed === null || parsed === void 0 ? void 0 : parsed.isValid())) {
+        return raw;
+    }
+    return (0,_grafana_data__WEBPACK_IMPORTED_MODULE_1__.dateTimeFormat)(parsed, {
+        timeZone,
+        format: _constants__WEBPACK_IMPORTED_MODULE_3__/* .FORMAT_DATE_MS */ .uU
+    });
+}
 
 
 /***/ }
 
 }]);
-//# sourceMappingURL=590.js.map?_cache=83c08e8bb9d39134ef57
+//# sourceMappingURL=590.js.map?_cache=733a363f0cec334afca0
